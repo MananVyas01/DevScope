@@ -1,6 +1,5 @@
 'use client'
 
-import { useEffect, useRef } from 'react'
 import {
   Chart as ChartJS,
   CategoryScale,
@@ -103,7 +102,7 @@ export default function Dashboard() {
       <div className="mb-8">
         <h1 className="text-2xl font-semibold text-gray-900 dark:text-white">Dashboard</h1>
         <p className="mt-2 text-sm text-gray-700 dark:text-gray-300">
-          Welcome back! Here's an overview of your development activity.
+          Welcome back! Here&apos;s an overview of your development activity.
         </p>
       </div>
 
