@@ -1,0 +1,249 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>DevScope Focus Timer Demo</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <style>
+        .timer-circle {
+            transform: rotate(-90deg);
+        }
+    </style>
+</head>
+<body class="bg-gray-50 dark:bg-gray-900 min-h-screen">
+    <div class="container mx-auto px-4 py-8">
+        <div class="max-w-md mx-auto">
+            <div class="bg-white dark:bg-gray-800 rounded-lg shadow-lg p-8">
+                <div class="text-center mb-8">
+                    <h1 class="text-2xl font-semibold text-gray-900 dark:text-white mb-2">Focus Timer</h1>
+                    <div class="flex items-center justify-center space-x-2">
+                        <div id="session-icon" class="w-6 h-6">🧠</div>
+                        <span id="session-type" class="text-lg font-medium text-blue-600 dark:text-blue-400">Focus Session</span>
+                    </div>
+                </div>
+
+                <!-- Timer Circle -->
+                <div class="relative w-48 h-48 mx-auto mb-8">
+                    <svg class="w-full h-full timer-circle" viewBox="0 0 100 100">
+                        <circle
+                            cx="50" cy="50" r="45"
+                            stroke="currentColor" stroke-width="2" fill="none"
+                            class="text-gray-200 dark:text-gray-700"
+                        />
+                        <circle
+                            id="progress-circle"
+                            cx="50" cy="50" r="45"
+                            stroke="currentColor" stroke-width="2" fill="none"
+                            stroke-dasharray="283" stroke-dashoffset="0"
+                            class="text-blue-600 transition-all duration-1000 ease-in-out"
+                        />
+                    </svg>
+                    
+                    <!-- Timer Display -->
+                    <div class="absolute inset-0 flex items-center justify-center">
+                        <div class="text-center">
+                            <div id="time-display" class="text-4xl font-bold text-gray-900 dark:text-white">25:00</div>
+                            <div id="status-display" class="text-sm text-gray-500 dark:text-gray-400 mt-1">Ready</div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Status Indicators -->
+                <div class="mb-6 flex justify-center space-x-4">
+                    <div id="activity-indicator" class="inline-flex items-center px-3 py-1 rounded-full text-sm bg-green-100 text-green-800">
+                        <div class="w-2 h-2 rounded-full mr-2 bg-green-500"></div>
+                        Active
+                    </div>
+                    
+                    <div id="network-indicator" class="inline-flex items-center px-3 py-1 rounded-full text-sm bg-blue-100 text-blue-800">
+                        <div class="w-2 h-2 rounded-full mr-2 bg-blue-500"></div>
+                        Online
+                    </div>
+                </div>
+
+                <!-- Control Buttons -->
+                <div class="flex justify-center space-x-4 mb-8">
+                    <button id="start-btn" onclick="startTimer()" class="flex items-center bg-green-600 hover:bg-green-700 text-white px-6 py-3 rounded-lg transition-colors">
+                        ▶️ Start
+                    </button>
+                    
+                    <button id="pause-btn" onclick="pauseTimer()" class="hidden flex items-center bg-yellow-600 hover:bg-yellow-700 text-white px-6 py-3 rounded-lg transition-colors">
+                        ⏸️ Pause
+                    </button>
+                    
+                    <button id="reset-btn" onclick="resetTimer()" class="hidden flex items-center bg-red-600 hover:bg-red-700 text-white px-6 py-3 rounded-lg transition-colors">
+                        🔄 Reset
+                    </button>
+                </div>
+
+                <!-- Session Stats -->
+                <div id="session-stats" class="hidden mt-8 grid grid-cols-2 gap-4 text-sm">
+                    <div class="bg-gray-50 dark:bg-gray-700 p-3 rounded-lg">
+                        <div class="text-gray-600 dark:text-gray-400">Active Time</div>
+                        <div id="active-time" class="text-lg font-semibold text-gray-900 dark:text-white">0m</div>
+                    </div>
+                    <div class="bg-gray-50 dark:bg-gray-700 p-3 rounded-lg">
+                        <div class="text-gray-600 dark:text-gray-400">Idle Time</div>
+                        <div id="idle-time" class="text-lg font-semibold text-gray-900 dark:text-white">0m</div>
+                    </div>
+                </div>
+
+                <!-- Overall Statistics -->
+                <div class="mt-8 bg-white dark:bg-gray-800 rounded-lg p-6 shadow-sm border border-gray-200 dark:border-gray-700">
+                    <h3 class="text-lg font-semibold text-gray-900 dark:text-white mb-4">Session Statistics</h3>
+                    <div class="grid grid-cols-2 md:grid-cols-4 gap-4 text-sm">
+                        <div class="text-center">
+                            <div class="text-2xl font-bold text-blue-600">0</div>
+                            <div class="text-gray-600">Today</div>
+                        </div>
+                        <div class="text-center">
+                            <div class="text-2xl font-bold text-green-600">0h</div>
+                            <div class="text-gray-600">Focus Time</div>
+                        </div>
+                        <div class="text-center">
+                            <div class="text-2xl font-bold text-purple-600">0</div>
+                            <div class="text-gray-600">Total Sessions</div>
+                        </div>
+                        <div class="text-center">
+                            <div class="text-2xl font-bold text-orange-600">0m</div>
+                            <div class="text-gray-600">Avg Length</div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Simple Timer Logic -->
+    <script>
+        let timeLeft = 25 * 60; // 25 minutes in seconds
+        let isRunning = false;
+        let interval = null;
+        let sessionType = 'focus';
+        let startTime = null;
+        let activeTime = 0;
+        let lastActivity = Date.now();
+
+        function formatTime(seconds) {
+            const mins = Math.floor(seconds / 60);
+            const secs = seconds % 60;
+            return `${mins.toString().padStart(2, '0')}:${secs.toString().padStart(2, '0')}`;
+        }
+
+        function updateDisplay() {
+            document.getElementById('time-display').textContent = formatTime(timeLeft);
+            const progress = ((25 * 60 - timeLeft) / (25 * 60)) * 100;
+            const circumference = 2 * Math.PI * 45;
+            const offset = circumference * (1 - progress / 100);
+            document.getElementById('progress-circle').style.strokeDashoffset = offset;
+        }
+
+        function startTimer() {
+            if (!isRunning) {
+                isRunning = true;
+                startTime = Date.now();
+                document.getElementById('start-btn').classList.add('hidden');
+                document.getElementById('pause-btn').classList.remove('hidden');
+                document.getElementById('reset-btn').classList.remove('hidden');
+                document.getElementById('status-display').textContent = 'Running';
+                document.getElementById('session-stats').classList.remove('hidden');
+                
+                interval = setInterval(() => {
+                    timeLeft--;
+                    updateDisplay();
+                    
+                    if (timeLeft <= 0) {
+                        completeSession();
+                    }
+                }, 1000);
+            }
+        }
+
+        function pauseTimer() {
+            if (isRunning) {
+                isRunning = false;
+                clearInterval(interval);
+                document.getElementById('start-btn').classList.remove('hidden');
+                document.getElementById('start-btn').innerHTML = '▶️ Resume';
+                document.getElementById('pause-btn').classList.add('hidden');
+                document.getElementById('status-display').textContent = 'Paused';
+            }
+        }
+
+        function resetTimer() {
+            isRunning = false;
+            clearInterval(interval);
+            timeLeft = 25 * 60;
+            updateDisplay();
+            document.getElementById('start-btn').classList.remove('hidden');
+            document.getElementById('start-btn').innerHTML = '▶️ Start';
+            document.getElementById('pause-btn').classList.add('hidden');
+            document.getElementById('reset-btn').classList.add('hidden');
+            document.getElementById('status-display').textContent = 'Ready';
+            document.getElementById('session-stats').classList.add('hidden');
+        }
+
+        function completeSession() {
+            isRunning = false;
+            clearInterval(interval);
+            
+            // Show completion
+            alert(`${sessionType === 'focus' ? 'Focus' : 'Break'} session completed!`);
+            
+            // Switch session type
+            sessionType = sessionType === 'focus' ? 'break' : 'focus';
+            timeLeft = sessionType === 'focus' ? 25 * 60 : 5 * 60;
+            
+            // Update UI
+            document.getElementById('session-type').textContent = sessionType === 'focus' ? 'Focus Session' : 'Break Session';
+            document.getElementById('session-icon').textContent = sessionType === 'focus' ? '🧠' : '☕';
+            
+            resetTimer();
+            updateDisplay();
+        }
+
+        // Activity tracking simulation
+        let isActive = true;
+        document.addEventListener('mousemove', () => {
+            lastActivity = Date.now();
+            if (!isActive) {
+                isActive = true;
+                updateActivityIndicator();
+            }
+        });
+
+        document.addEventListener('keypress', () => {
+            lastActivity = Date.now();
+            if (!isActive) {
+                isActive = true;
+                updateActivityIndicator();
+            }
+        });
+
+        function updateActivityIndicator() {
+            const indicator = document.getElementById('activity-indicator');
+            if (isActive) {
+                indicator.className = 'inline-flex items-center px-3 py-1 rounded-full text-sm bg-green-100 text-green-800';
+                indicator.innerHTML = '<div class="w-2 h-2 rounded-full mr-2 bg-green-500"></div>Active';
+            } else {
+                indicator.className = 'inline-flex items-center px-3 py-1 rounded-full text-sm bg-yellow-100 text-yellow-800';
+                indicator.innerHTML = '<div class="w-2 h-2 rounded-full mr-2 bg-yellow-500"></div>Idle';
+            }
+        }
+
+        // Check for inactivity every 5 seconds
+        setInterval(() => {
+            if (Date.now() - lastActivity > 30000) { // 30 seconds
+                if (isActive) {
+                    isActive = false;
+                    updateActivityIndicator();
+                }
+            }
+        }, 5000);
+
+        // Initialize display
+        updateDisplay();
+    </script>
+</body>
+</html>
