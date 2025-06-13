@@ -1,0 +1,23 @@
+{
+  "name": "devscope-monorepo",
+  "private": true,
+  "scripts": {
+    "build": "turbo build",
+    "dev": "turbo dev",
+    "lint": "turbo lint",
+    "type-check": "turbo type-check",
+    "clean": "turbo clean"
+  },
+  "devDependencies": {
+    "turbo": "^2.5.4"
+  },
+  "packageManager": "npm@10.8.2",
+  "workspaces": [
+    "frontend",
+    "backend",
+    "desktop",
+    "extension",
+    "ai-engine",
+    "packages/*"
+  ]
+}
