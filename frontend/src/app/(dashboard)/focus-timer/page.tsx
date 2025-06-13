@@ -4,8 +4,15 @@
 import { useState, useEffect, useCallback, useRef } from 'react';
 import { Play, Pause, RotateCcw, Coffee, Brain } from 'lucide-react';
 import { useAuth } from '@/components/auth-provider';
-import { api, OfflineStorage, useNetworkStatus, type ActivityData } from '@/lib/api';
+import {
+  api,
+  OfflineStorage,
+  useNetworkStatus,
+  type ActivityData,
+} from '@/lib/api';
 import MoodTrackerModal from '@/components/mood-tracker-modal';
+import { useNotifications } from '@/hooks/useNotifications';
+import { useSessionStats } from '@/hooks/useSessionStats';
 
 type SessionType = 'focus' | 'break';
 type SessionStatus = 'idle' | 'running' | 'paused';
@@ -31,6 +38,8 @@ interface SessionData {
 export default function FocusTimer() {
   const { user } = useAuth();
   const isOnline = useNetworkStatus();
+  const { showSessionComplete, showActivityReminder } = useNotifications();
+  const { stats, refreshStats } = useSessionStats();
 
   // Timer state
   const [sessionType, setSessionType] = useState<SessionType>('focus');
@@ -49,10 +58,12 @@ export default function FocusTimer() {
   const inactivityTimerRef = useRef<ReturnType<typeof setTimeout> | null>(null);
   const intervalRef = useRef<ReturnType<typeof setInterval> | null>(null);
   const syncIntervalRef = useRef<ReturnType<typeof setInterval> | null>(null);
-  
+
   // Mood tracker state
   const [showMoodTracker, setShowMoodTracker] = useState(false);
-  const [completedSession, setCompletedSession] = useState<SessionData | null>(null);
+  const [completedSession, setCompletedSession] = useState<SessionData | null>(
+    null
+  );
 
   // Session durations
   const FOCUS_DURATION = 25 * 60;
@@ -103,6 +114,11 @@ export default function FocusTimer() {
         ...prev,
         { start: Date.now(), end: 0, isActive: false },
       ]);
+
+      // Show activity reminder if in focus session
+      if (status === 'running' && sessionType === 'focus') {
+        showActivityReminder();
+      }
     }, INACTIVITY_THRESHOLD);
   }, [isActive]);
 
@@ -127,7 +143,7 @@ export default function FocusTimer() {
   // Sync offline data when coming back online
   useEffect(() => {
     if (isOnline && user) {
-      OfflineStorage.syncAll().catch((error) => {
+      OfflineStorage.syncAll().catch(error => {
         console.error('Failed to sync offline data:', error);
       });
     }
@@ -136,7 +152,7 @@ export default function FocusTimer() {
   // Sync offline data on component mount
   useEffect(() => {
     if (isOnline && user) {
-      OfflineStorage.syncAll().catch((error) => {
+      OfflineStorage.syncAll().catch(error => {
         console.error('Failed to sync offline data on mount:', error);
       });
     }
@@ -266,6 +282,12 @@ export default function FocusTimer() {
     // Send final session data
     syncSessionData(completedSession, true);
 
+    // Refresh stats after session completion
+    refreshStats();
+
+    // Show notification
+    showSessionComplete(sessionType, completedSession.activeDuration);
+
     // Clear intervals
     if (intervalRef.current) clearInterval(intervalRef.current);
     if (syncIntervalRef.current) clearInterval(syncIntervalRef.current);
@@ -280,7 +302,23 @@ export default function FocusTimer() {
 
     // Show mood tracker if focus session completed
     if (sessionType === 'focus') {
-      showMoodTracker(completedSession);
+      openMoodTracker(completedSession);
+    }
+
+    // Auto-start break session after focus session
+    if (sessionType === 'focus') {
+      setTimeout(() => {
+        if (
+          window.confirm(
+            'Focus session complete! Would you like to start your break?'
+          )
+        ) {
+          setSessionType('break');
+          setTimeLeft(BREAK_DURATION);
+          // Auto-start the break timer
+          setTimeout(() => startTimer(), 1000);
+        }
+      }, 2000);
     }
   };
 
@@ -335,7 +373,7 @@ export default function FocusTimer() {
       if (isOnline) {
         // Try to sync to backend
         await api.createActivity(payload);
-        
+
         // If successful and we're online, try to sync any offline data
         if (isFinal) {
           await OfflineStorage.syncAll();
@@ -370,8 +408,7 @@ export default function FocusTimer() {
   };
 
   // Show mood tracker modal
-  // Show mood tracker modal
-  const showMoodTracker = (session: SessionData) => {
+  const openMoodTracker = (session: SessionData) => {
     setCompletedSession(session);
     setShowMoodTracker(true);
   };
@@ -470,7 +507,7 @@ export default function FocusTimer() {
               ></div>
               {isActive ? 'Active' : 'Idle'}
             </div>
-            
+
             <div
               className={`inline-flex items-center px-3 py-1 rounded-full text-sm ${
                 isOnline
@@ -558,6 +595,45 @@ export default function FocusTimer() {
               </div>
             </div>
           )}
+
+          {/* Overall Statistics */}
+          <div className="mt-8 bg-white dark:bg-gray-800 rounded-lg p-6 shadow-sm border border-gray-200 dark:border-gray-700">
+            <h3 className="text-lg font-semibold text-gray-900 dark:text-white mb-4">
+              Session Statistics
+            </h3>
+            <div className="grid grid-cols-2 md:grid-cols-4 gap-4 text-sm">
+              <div className="text-center">
+                <div className="text-2xl font-bold text-blue-600 dark:text-blue-400">
+                  {stats.todaySessions}
+                </div>
+                <div className="text-gray-600 dark:text-gray-400">Today</div>
+              </div>
+              <div className="text-center">
+                <div className="text-2xl font-bold text-green-600 dark:text-green-400">
+                  {Math.round(stats.todayFocusTime / 60)}h
+                </div>
+                <div className="text-gray-600 dark:text-gray-400">
+                  Focus Time
+                </div>
+              </div>
+              <div className="text-center">
+                <div className="text-2xl font-bold text-purple-600 dark:text-purple-400">
+                  {stats.totalSessions}
+                </div>
+                <div className="text-gray-600 dark:text-gray-400">
+                  Total Sessions
+                </div>
+              </div>
+              <div className="text-center">
+                <div className="text-2xl font-bold text-orange-600 dark:text-orange-400">
+                  {Math.round(stats.averageSessionLength)}m
+                </div>
+                <div className="text-gray-600 dark:text-gray-400">
+                  Avg Length
+                </div>
+              </div>
+            </div>
+          </div>
         </div>
       </div>
 
