@@ -1,0 +1,42 @@
+{
+  "name": "devscope-extension",
+  "displayName": "DevScope Extension",
+  "description": "VSCode extension for DevScope development workflows",
+  "version": "0.0.1",
+  "engines": {
+    "vscode": "^1.74.0"
+  },
+  "categories": [
+    "Other"
+  ],
+  "activationEvents": [],
+  "main": "./out/extension.js",
+  "contributes": {
+    "commands": [
+      {
+        "command": "devscope.helloWorld",
+        "title": "Hello World"
+      }
+    ]
+  },
+  "scripts": {
+    "vscode:prepublish": "npm run compile",
+    "compile": "tsc -p ./",
+    "watch": "tsc -watch -p ./",
+    "pretest": "npm run compile && npm run lint",
+    "lint": "eslint src --ext ts",
+    "test": "node ./out/test/runTest.js"
+  },
+  "keywords": [],
+  "author": "",
+  "license": "ISC",
+  "devDependencies": {
+    "@types/node": "^22.10.2",
+    "@types/vscode": "^1.96.0",
+    "ts-loader": "^9.5.1",
+    "typescript": "^5.7.2",
+    "vsce": "^2.15.0",
+    "webpack": "^5.97.1",
+    "webpack-cli": "^5.1.4"
+  }
+}
