@@ -14,7 +14,6 @@ from slowapi.errors import RateLimitExceeded
 from slowapi.middleware import SlowAPIMiddleware
 from slowapi.util import get_remote_address
 
-from app.auth.dependencies import get_current_user
 from app.config import settings
 from app.middleware.auth import AuthMiddleware
 from app.middleware.logging import LoggingMiddleware
@@ -142,6 +141,22 @@ async def api_health_check():
 # Include API routers
 from app.api.v1.api import api_router
 app.include_router(api_router, prefix=settings.API_V1_STR)
+
+
+@app.on_event("startup")
+async def startup_event():
+    """Initialize database on startup."""
+    from app.models.database import init_db
+    await init_db()
+    logger.info("Database initialized")
+
+
+@app.on_event("shutdown")
+async def shutdown_event():
+    """Clean up on shutdown."""
+    from app.models.database import close_db
+    await close_db()
+    logger.info("Database connections closed")
 
 
 if __name__ == "__main__":

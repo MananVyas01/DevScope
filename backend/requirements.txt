@@ -15,6 +15,7 @@ sqlalchemy==2.0.36
 alembic==1.14.0
 psycopg2-binary==2.9.10
 asyncpg==0.30.0
+aiosqlite==0.22.0
 
 # Supabase integration
 supabase==2.10.0
@@ -26,7 +27,7 @@ passlib[bcrypt]==1.7.4
 python-jwt==4.1.0
 
 # HTTP client
-httpx==0.28.1
+httpx>=0.26,<0.28
 aiohttp==3.11.10
 
 # Redis and caching
@@ -37,15 +38,14 @@ aioredis==2.0.1
 celery==5.4.0
 
 # Monitoring and logging
-structlog==24.5.0
+structlog==25.4.0
 prometheus-client==0.21.1
 
 # Rate limiting
 slowapi==0.1.9
 limits==3.14.0
 
-# CORS
-python-cors==1.7.0
+# CORS - already included in FastAPI
 
 # Data validation and serialization
 email-validator==2.2.0
