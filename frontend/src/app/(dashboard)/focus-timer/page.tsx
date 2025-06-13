@@ -4,6 +4,8 @@
 import { useState, useEffect, useCallback, useRef } from 'react';
 import { Play, Pause, RotateCcw, Coffee, Brain } from 'lucide-react';
 import { useAuth } from '@/components/auth-provider';
+import { api, OfflineStorage, useNetworkStatus, type ActivityData } from '@/lib/api';
+import MoodTrackerModal from '@/components/mood-tracker-modal';
 
 type SessionType = 'focus' | 'break';
 type SessionStatus = 'idle' | 'running' | 'paused';
@@ -28,6 +30,7 @@ interface SessionData {
 
 export default function FocusTimer() {
   const { user } = useAuth();
+  const isOnline = useNetworkStatus();
 
   // Timer state
   const [sessionType, setSessionType] = useState<SessionType>('focus');
@@ -46,6 +49,10 @@ export default function FocusTimer() {
   const inactivityTimerRef = useRef<ReturnType<typeof setTimeout> | null>(null);
   const intervalRef = useRef<ReturnType<typeof setInterval> | null>(null);
   const syncIntervalRef = useRef<ReturnType<typeof setInterval> | null>(null);
+  
+  // Mood tracker state
+  const [showMoodTracker, setShowMoodTracker] = useState(false);
+  const [completedSession, setCompletedSession] = useState<SessionData | null>(null);
 
   // Session durations
   const FOCUS_DURATION = 25 * 60;
@@ -116,6 +123,24 @@ export default function FocusTimer() {
       }
     };
   }, [markActive]);
+
+  // Sync offline data when coming back online
+  useEffect(() => {
+    if (isOnline && user) {
+      OfflineStorage.syncAll().catch((error) => {
+        console.error('Failed to sync offline data:', error);
+      });
+    }
+  }, [isOnline, user]);
+
+  // Sync offline data on component mount
+  useEffect(() => {
+    if (isOnline && user) {
+      OfflineStorage.syncAll().catch((error) => {
+        console.error('Failed to sync offline data on mount:', error);
+      });
+    }
+  }, []);
 
   // Generate session ID
   const generateSessionId = () => {
@@ -288,7 +313,7 @@ export default function FocusTimer() {
     if (!user) return;
 
     try {
-      const payload = {
+      const payload: ActivityData = {
         session_id: session.id,
         activity_type: session.type === 'focus' ? 'coding' : 'break',
         description: `${session.type} session`,
@@ -307,38 +332,48 @@ export default function FocusTimer() {
         },
       };
 
-      // TODO: Replace with actual API call to backend
-      // console.log('Syncing session data:', payload)
-
-      // Store in localStorage for offline support
-      const offlineData = JSON.parse(
-        localStorage.getItem('offline_sessions') || '[]'
-      );
-      offlineData.push({ ...payload, timestamp: Date.now(), synced: false });
-      localStorage.setItem('offline_sessions', JSON.stringify(offlineData));
+      if (isOnline) {
+        // Try to sync to backend
+        await api.createActivity(payload);
+        
+        // If successful and we're online, try to sync any offline data
+        if (isFinal) {
+          await OfflineStorage.syncAll();
+          OfflineStorage.clearSyncedData();
+        }
+      } else {
+        // Store offline for later sync
+        OfflineStorage.storeActivity(payload);
+      }
     } catch (error) {
-      // console.error('Failed to sync session data:', error)
       void error; // Suppress unused variable warning
 
-      // Store in localStorage for retry
-      const offlineData = JSON.parse(
-        localStorage.getItem('offline_sessions') || '[]'
-      );
-      offlineData.push({
-        ...session,
-        timestamp: Date.now(),
-        synced: false,
-        isFinal,
+      // Store in offline storage for retry
+      OfflineStorage.storeActivity({
+        session_id: session.id,
+        activity_type: session.type === 'focus' ? 'coding' : 'break',
+        description: `${session.type} session`,
+        duration_minutes: Math.round(session.activeDuration / 60000),
+        idle_minutes: Math.round(session.idleDuration / 60000),
+        start_time: new Date(session.startTime).toISOString(),
+        end_time: session.endTime
+          ? new Date(session.endTime).toISOString()
+          : undefined,
+        tags: [session.type, 'pomodoro'],
+        metadata: {
+          session_type: session.type,
+          status: session.status,
+          isFinal,
+        },
       });
-      localStorage.setItem('offline_sessions', JSON.stringify(offlineData));
     }
   };
 
   // Show mood tracker modal
+  // Show mood tracker modal
   const showMoodTracker = (session: SessionData) => {
-    // TODO: Implement mood tracker modal
-    // console.log('Show mood tracker for session:', session)
-    void session; // Suppress unused variable warning
+    setCompletedSession(session);
+    setShowMoodTracker(true);
   };
 
   return (
@@ -419,8 +454,8 @@ export default function FocusTimer() {
             </div>
           </div>
 
-          {/* Activity indicator */}
-          <div className="mb-6">
+          {/* Activity and network status indicators */}
+          <div className="mb-6 flex justify-center space-x-4">
             <div
               className={`inline-flex items-center px-3 py-1 rounded-full text-sm ${
                 isActive
@@ -434,6 +469,21 @@ export default function FocusTimer() {
                 }`}
               ></div>
               {isActive ? 'Active' : 'Idle'}
+            </div>
+            
+            <div
+              className={`inline-flex items-center px-3 py-1 rounded-full text-sm ${
+                isOnline
+                  ? 'bg-blue-100 text-blue-800 dark:bg-blue-900 dark:text-blue-200'
+                  : 'bg-red-100 text-red-800 dark:bg-red-900 dark:text-red-200'
+              }`}
+            >
+              <div
+                className={`w-2 h-2 rounded-full mr-2 ${
+                  isOnline ? 'bg-blue-500' : 'bg-red-500'
+                }`}
+              ></div>
+              {isOnline ? 'Online' : 'Offline'}
             </div>
           </div>
 
@@ -510,6 +560,14 @@ export default function FocusTimer() {
           )}
         </div>
       </div>
+
+      {/* Mood Tracker Modal */}
+      <MoodTrackerModal
+        isOpen={showMoodTracker}
+        onClose={() => setShowMoodTracker(false)}
+        sessionType={completedSession?.type || 'focus'}
+        sessionDuration={completedSession?.activeDuration || 0}
+      />
     </div>
   );
 }
