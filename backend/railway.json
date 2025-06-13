@@ -1,0 +1,67 @@
+{
+  "name": "DevScope Backend API",
+  "description": "FastAPI backend for DevScope developer analytics platform",
+  "schema": "https://json-schema.org/draft/2019-09/schema",
+  "icon": "https://api.iconify.design/logos/fastapi.svg",
+  "tags": ["fastapi", "python", "postgresql", "analytics", "developer-tools"],
+  "repository": "https://github.com/your-username/devscope",
+  "website": "https://devscope.app",
+  "env": {
+    "SUPABASE_URL": {
+      "description": "Supabase project URL",
+      "required": true
+    },
+    "SUPABASE_ANON_KEY": {
+      "description": "Supabase anonymous key",
+      "required": true
+    },
+    "SUPABASE_SERVICE_KEY": {
+      "description": "Supabase service role key",
+      "required": true
+    },
+    "JWT_SECRET": {
+      "description": "Supabase JWT secret for token validation",
+      "required": true
+    },
+    "SECRET_KEY": {
+      "description": "Secret key for API security",
+      "generator": "secret"
+    },
+    "ENVIRONMENT": {
+      "description": "Application environment",
+      "default": "production"
+    },
+    "DEBUG": {
+      "description": "Enable debug mode",
+      "default": "false"
+    },
+    "LOG_LEVEL": {
+      "description": "Logging level",
+      "default": "INFO"
+    },
+    "GITHUB_TOKEN": {
+      "description": "GitHub personal access token for API integration",
+      "required": false
+    },
+    "GITHUB_CLIENT_ID": {
+      "description": "GitHub OAuth app client ID",
+      "required": false
+    },
+    "GITHUB_CLIENT_SECRET": {
+      "description": "GitHub OAuth app client secret",
+      "required": false
+    },
+    "OPENAI_API_KEY": {
+      "description": "OpenAI API key for AI-powered insights",
+      "required": false
+    }
+  },
+  "build": {
+    "commands": ["pip install -r requirements.txt"]
+  },
+  "deploy": {
+    "startCommand": "uvicorn app.main:app --host 0.0.0.0 --port $PORT",
+    "healthcheckPath": "/health",
+    "restartPolicyType": "on_failure"
+  }
+}
