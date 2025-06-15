@@ -1,0 +1,16 @@
+{
+  "name": "Code Streak Tracker",
+  "description": "Track your daily coding streaks and celebrate consistent development habits",
+  "version": "1.0.0",
+  "entry": "https://cdn.jsdelivr.net/gh/example/devscope-streak-plugin@main/index.js",
+  "author": "DevScope Team",
+  "homepage": "https://github.com/example/devscope-streak-plugin",
+  "repository": "https://github.com/example/devscope-streak-plugin",
+  "category": "productivity",
+  "tags": ["streaks", "habits", "motivation", "tracking"],
+  "permissions": ["read:stats"],
+  "icon": "https://cdn.jsdelivr.net/gh/example/devscope-streak-plugin@main/icon.png",
+  "screenshots": [
+    "https://cdn.jsdelivr.net/gh/example/devscope-streak-plugin@main/screenshot1.png"
+  ]
+}

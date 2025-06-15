@@ -17,13 +17,17 @@ import {
   Sun,
   TrendingUp,
   Users,
+  Brain,
+  Package,
 } from 'lucide-react';
 import { useTheme } from 'next-themes';
 
 const navigation = [
   { name: 'Dashboard', href: '/dashboard', icon: BarChart3 },
   { name: 'Analytics', href: '/analytics', icon: TrendingUp },
+  { name: 'AI Coach', href: '/coach', icon: Brain },
   { name: 'Community', href: '/community', icon: Users },
+  { name: 'Plugins', href: '/plugins', icon: Package },
   { name: 'Focus Timer', href: '/focus-timer', icon: Timer },
   { name: 'Mood Tracker', href: '/mood-tracker', icon: Heart },
   { name: 'Settings', href: '/settings', icon: Settings },
