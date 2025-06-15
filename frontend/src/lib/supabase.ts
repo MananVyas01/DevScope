@@ -7,10 +7,11 @@ const supabaseAnonKey =
   process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY ||
   'eyJ0eXAiOiJKV1QiLCJhbGciOiJIUzI1NiJ9.eyJpc3MiOiJzdXBhYmFzZS1kZW1vIiwicm9sZSI6ImFub24iLCJleHAiOjE5ODM4MTI5OTZ9.CRXP1A7WOeoJeXxjNni43kdQwgnWNReilDMblYTn_I0';
 
-// Validate required environment variables
+// Validate required environment variables (only when actually running, not during build)
 if (
   !process.env.NEXT_PUBLIC_SUPABASE_URL &&
-  process.env.NODE_ENV === 'production'
+  process.env.NODE_ENV === 'production' &&
+  typeof window !== 'undefined'
 ) {
   throw new Error(
     'Missing required environment variable: NEXT_PUBLIC_SUPABASE_URL'
