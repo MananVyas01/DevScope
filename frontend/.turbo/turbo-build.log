@@ -1,38 +1,34 @@
 
+
 > frontend@0.1.0 build
 > next build
 
-Attention: Next.js now collects completely anonymous telemetry regarding usage.
-This information is used to shape Next.js' roadmap and prioritize features.
-You can learn more, including how to opt-out if you'd not like to participate in this anonymous program, by visiting the following URL:
-https://nextjs.org/telemetry
+[1G[0K   [1m[38;2;173;127;168m▲ Next.js 15.3.3[39m[22m
+   - Environments: .env
 
-   ▲ Next.js 15.3.3
+ [37m[1m [22m[39m Creating an optimized production build ...
+ [32m[1m✓[22m[39m Compiled successfully in 12.0s
+ [37m[1m [22m[39m Skipping validation of types
+ [37m[1m [22m[39m Skipping linting
+[?25l [37m[1m [22m[39m Collecting page data  [36m.[39m[2K[1G [37m[1m [22m[39m Collecting page data  [36m..[39m[2K[1G [37m[1m [22m[39m Collecting page data  [36m...[39m[2K[1G[?25h [37m[1m [22m[39m Collecting page data     [32m[1m✓[22m[39m Collecting page data 
+[?25l [37m[1m [22m[39m Generating static pages (0/9)  [36m[    ][39m[2K[1G [37m[1m [22m[39m Generating static pages (0/9)  [36m[=   ][39m[2K[1G [37m[1m [22m[39m Generating static pages (0/9)  [36m[==  ][39m[2K[1G [37m[1m [22m[39m Generating static pages (0/9)  [36m[=== ][39m[2K[1G [37m[1m [22m[39m Generating static pages (0/9)  [36m[ ===][39m[2K[1G[?25h [32m[1m✓[22m[39m Generating static pages (9/9)
+[?25l [37m[1m [22m[39m Finalizing page optimization  [36m.[39m[?25l [37m[1m [22m[39m Collecting build traces  [36m.[39m[2K[1G [37m[1m [22m[39m Finalizing page optimization  [36m..[39m[2K[1G [37m[1m [22m[39m Collecting build traces  [36m..[39m[2K[1G [37m[1m [22m[39m Finalizing page optimization  [36m...[39m[2K[1G [37m[1m [22m[39m Collecting build traces  [36m...[39m[2K[1G [37m[1m [22m[39m Finalizing page optimization  [36m.[39m[2K[1G [37m[1m [22m[39m Collecting build traces  [36m.[39m[2K[1G [37m[1m [22m[39m Finalizing page optimization  [36m..[39m[2K[1G [37m[1m [22m[39m Collecting build traces  [36m..[39m[2K[1G [37m[1m [22m[39m Finalizing page optimization  [36m...[39m[2K[1G [37m[1m [22m[39m Collecting build traces  [36m...[39m[2K[1G [37m[1m [22m[39m Finalizing page optimization  [36m.[39m[2K[1G [37m[1m [22m[39m Collecting build traces  [36m.[39m[2K[1G [37m[1m [22m[39m Finalizing page optimization  [36m..[39m[2K[1G [37m[1m [22m[39m Collecting build traces  [36m..[39m[2K[1G [37m[1m [22m[39m Finalizing page optimization  [36m...[39m[2K[1G [37m[1m [22m[39m Collecting build traces  [36m...[39m[2K[1G [37m[1m [22m[39m Finalizing page optimization  [36m.[39m[2K[1G [37m[1m [22m[39m Collecting build traces  [36m.[39m[2K[1G [37m[1m [22m[39m Finalizing page optimization  [36m..[39m[2K[1G [37m[1m [22m[39m Collecting build traces  [36m..[39m[2K[1G [37m[1m [22m[39m Finalizing page optimization  [36m...[39m[2K[1G [37m[1m [22m[39m Collecting build traces  [36m...[39m[2K[1G [37m[1m [22m[39m Finalizing page optimization  [36m.[39m[2K[1G [37m[1m [22m[39m Collecting build traces  [36m.[39m[2K[1G [37m[1m [22m[39m Finalizing page optimization  [36m..[39m[2K[1G [37m[1m [22m[39m Collecting build traces  [36m..[39m[2K[1G [37m[1m [22m[39m Finalizing page optimization  [36m...[39m[2K[1G [37m[1m [22m[39m Collecting build traces  [36m...[39m[2K[1G [37m[1m [22m[39m Finalizing page optimization  [36m.[39m[2K[1G [37m[1m [22m[39m Collecting build traces  [36m.[39m[2K[1G [37m[1m [22m[39m Finalizing page optimization  [36m..[39m[2K[1G [37m[1m [22m[39m Collecting build traces  [36m..[39m[2K[1G [37m[1m [22m[39m Finalizing page optimization  [36m...[39m[2K[1G [37m[1m [22m[39m Collecting build traces  [36m...[39m[2K[1G [37m[1m [22m[39m Finalizing page optimization  [36m.[39m[2K[1G [37m[1m [22m[39m Collecting build traces  [36m.[39m[2K[1G [37m[1m [22m[39m Finalizing page optimization  [36m..[39m[2K[1G [37m[1m [22m[39m Collecting build traces  [36m..[39m[2K[1G [37m[1m [22m[39m Finalizing page optimization  [36m...[39m[2K[1G [37m[1m [22m[39m Collecting build traces  [36m...[39m[2K[1G [37m[1m [22m[39m Finalizing page optimization  [36m.[39m[2K[1G [37m[1m [22m[39m Collecting build traces  [36m.[39m[2K[1G [37m[1m [22m[39m Finalizing page optimization  [36m..[39m[2K[1G [37m[1m [22m[39m Collecting build traces  [36m..[39m[2K[1G [37m[1m [22m[39m Finalizing page optimization  [36m...[39m[2K[1G [37m[1m [22m[39m Collecting build traces  [36m...[39m[2K[1G [37m[1m [22m[39m Finalizing page optimization  [36m.[39m[2K[1G [37m[1m [22m[39m Collecting build traces  [36m.[39m[2K[1G[?25h [37m[1m [22m[39m Collecting build traces     [32m[1m✓[22m[39m Collecting build traces 
+[2K[1G[?25h [37m[1m [22m[39m Finalizing page optimization     [32m[1m✓[22m[39m Finalizing page optimization 
 
-   Creating an optimized production build ...
- ✓ Compiled successfully in 21.0s
-   Skipping validation of types
-   Skipping linting
-   Collecting page data ...
-   Generating static pages (0/9) ...
-Error occurred prerendering page "/_not-found". Read more: https://nextjs.org/docs/messages/prerender-error
-Error: supabaseUrl is required.
-    at new ta (/workspaces/DevScope/frontend/.next/server/chunks/439.js:6:378785)
-    at tr (/workspaces/DevScope/frontend/.next/server/chunks/439.js:6:382949)
-    at 1608 (/workspaces/DevScope/frontend/.next/server/app/_not-found/page.js:1:457)
-    at Object.t [as require] (/workspaces/DevScope/frontend/.next/server/webpack-runtime.js:1:128)
-    at require (/workspaces/DevScope/node_modules/next/dist/compiled/next-server/app-page.runtime.prod.js:140:10304)
-    at u (/workspaces/DevScope/node_modules/next/dist/compiled/next-server/app-page.runtime.prod.js:92:646)
-    at U (/workspaces/DevScope/node_modules/next/dist/compiled/next-server/app-page.runtime.prod.js:92:10632)
-    at T (/workspaces/DevScope/node_modules/next/dist/compiled/next-server/app-page.runtime.prod.js:92:8681)
-    at rM (/workspaces/DevScope/node_modules/next/dist/compiled/next-server/app-page.runtime.prod.js:76:33176)
-    at nW (/workspaces/DevScope/node_modules/next/dist/compiled/next-server/app-page.runtime.prod.js:76:65533)
-Export encountered an error on /_not-found/page: /_not-found, exiting the build.
- ⨯ Next.js build worker exited with code: 1 and signal: null
-npm error Lifecycle script `build` failed with error:
-npm error code 1
-npm error path /workspaces/DevScope/frontend
-npm error workspace frontend@0.1.0
-npm error location /workspaces/DevScope/frontend
-npm error command failed
-npm error command sh -c next build
+[4mRoute (app)[24m                                 [4mSize[24m  [4mFirst Load JS[24m  [4m[24m  [4m[24m
+┌ ƒ /                                      142 B         [37m[1m101 kB[22m[39m
+├ ○ /_not-found                            981 B         [37m[1m102 kB[22m[39m
+├ ○ /dashboard                           68.8 kB         [37m[1m170 kB[22m[39m
+├ ○ /focus-timer                          8.6 kB         [37m[1m146 kB[22m[39m
+├ ○ /mood-tracker                          142 B         [37m[1m101 kB[22m[39m
+└ ○ /settings                              142 B         [37m[1m101 kB[22m[39m
++ First Load JS shared by all             [37m[1m101 kB[22m[39m
+  ├ chunks/870-ba85e4f3212ac78a.js       45.9 kB
+  ├ chunks/c7879cf7-330b1f5040772353.js  53.2 kB
+  └ other shared chunks (total)          1.92 kB
+
+
+○  (Static)   prerendered as static content
+ƒ  (Dynamic)  server-rendered on demand
+
+[?25h[1G[0K⠙[1G[0K
