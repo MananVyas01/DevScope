@@ -61,19 +61,17 @@ async def main():
     # Test imports
     print("\n📦 Testing Imports...")
     imports_ok = await test_basic_import()
-    
     if not imports_ok:
         print("❌ Import tests failed, skipping database tests")
         return
-    
     # Test database
     print("\n🗄️  Testing Database...")
     db_ok = await test_database_initialization()
-    
     if imports_ok and db_ok:
         print("\n🎉 All tests passed! The API is ready to run.")
         print("\n💡 To start the server, run:")
-        print("   cd backend && uvicorn app.main:app --host 0.0.0.0 --port 8000 --reload")
+        print("   cd backend && uvicorn app.main:app --host 0.0.0.0 "
+      "--port 8000 --reload")
     else:
         print("\n❌ Some tests failed. Please check the errors above.")
 
