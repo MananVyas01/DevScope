@@ -12,6 +12,23 @@ jobs:
     steps:
     - uses: actions/checkout@v4
     
+    - name: Verify Vercel secrets
+      run: |
+        if [ -z "${{ secrets.VERCEL_TOKEN }}" ]; then
+          echo "🚨 ERROR: VERCEL_TOKEN secret is not configured"
+          echo "📚 Please see .github/VERCEL_TROUBLESHOOTING.md for setup instructions"
+          exit 1
+        fi
+        if [ -z "${{ secrets.PROJECT_ID }}" ]; then
+          echo "🚨 ERROR: PROJECT_ID secret is not configured" 
+          exit 1
+        fi
+        if [ -z "${{ secrets.ORG_ID }}" ]; then
+          echo "🚨 ERROR: ORG_ID secret is not configured"
+          exit 1
+        fi
+        echo "✅ All Vercel secrets are configured"
+    
     - name: Setup Node.js
       uses: actions/setup-node@v4
       with:
@@ -24,9 +41,9 @@ jobs:
     - name: Build frontend
       run: npm run build --workspace=frontend
       env:
-        NEXT_PUBLIC_API_URL: ${{ secrets.NEXT_PUBLIC_API_URL }}
-        NEXT_PUBLIC_SUPABASE_URL: ${{ secrets.NEXT_PUBLIC_SUPABASE_URL }}
-        NEXT_PUBLIC_SUPABASE_ANON_KEY: ${{ secrets.NEXT_PUBLIC_SUPABASE_ANON_KEY }}
+        NEXT_PUBLIC_API_URL: ${{ secrets.NEXT_PUBLIC_API_URL || 'http://localhost:8000' }}
+        NEXT_PUBLIC_SUPABASE_URL: ${{ secrets.NEXT_PUBLIC_SUPABASE_URL || 'https://placeholder.supabase.co' }}
+        NEXT_PUBLIC_SUPABASE_ANON_KEY: ${{ secrets.NEXT_PUBLIC_SUPABASE_ANON_KEY || 'placeholder-key' }}
     
     - name: Deploy to Vercel
       uses: amondnet/vercel-action@v25
