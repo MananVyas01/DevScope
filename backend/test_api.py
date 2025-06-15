@@ -74,7 +74,10 @@ async def main():
     if imports_ok and db_ok:
         print("\n🎉 All tests passed! The API is ready to run.")
         print("\n💡 To start the server, run:")
-        print("   cd backend && uvicorn app.main:app --host 0.0.0.0 --port 8000 --reload")  # Fixed indentation
+        print(
+            "   cd backend && uvicorn app.main:app "
+            "--host 0.0.0.0 --port 8000 --reload"
+        )
     else:
         print("\n❌ Some tests failed. Please check the errors above.")
 
