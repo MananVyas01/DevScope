@@ -357,22 +357,14 @@ export default function FocusTimer() {
 
     try {
       const payload: ActivityData = {
-        session_id: session.id,
         activity_type: session.type === 'focus' ? 'coding' : 'break',
         description: `${session.type} session`,
         duration_minutes: Math.round(session.activeDuration / 60000),
-        idle_minutes: Math.round(session.idleDuration / 60000),
         start_time: new Date(session.startTime).toISOString(),
         end_time: session.endTime
           ? new Date(session.endTime).toISOString()
           : undefined,
         tags: [session.type, 'pomodoro'],
-        metadata: {
-          session_type: session.type,
-          status: session.status,
-          activity_segments: session.activitySegments.length,
-          total_duration: session.duration,
-        },
       };
 
       if (isOnline) {
@@ -393,21 +385,14 @@ export default function FocusTimer() {
 
       // Store in offline storage for retry
       OfflineStorage.storeActivity({
-        session_id: session.id,
         activity_type: session.type === 'focus' ? 'coding' : 'break',
         description: `${session.type} session`,
         duration_minutes: Math.round(session.activeDuration / 60000),
-        idle_minutes: Math.round(session.idleDuration / 60000),
         start_time: new Date(session.startTime).toISOString(),
         end_time: session.endTime
           ? new Date(session.endTime).toISOString()
           : undefined,
         tags: [session.type, 'pomodoro'],
-        metadata: {
-          session_type: session.type,
-          status: session.status,
-          isFinal,
-        },
       });
     }
   };

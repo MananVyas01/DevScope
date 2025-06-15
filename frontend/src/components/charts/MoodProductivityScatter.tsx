@@ -119,13 +119,14 @@ export default function MoodProductivityScatter({
         borderWidth: 1,
         callbacks: {
           title: () => '',
-          label: (context: {
-            dataset: { label: string };
-            parsed: { x: number; y: number };
-          }) => {
-            const dataset = context.dataset.label;
-            const mood = context.parsed.x;
-            const productivity = context.parsed.y;
+          label: (context: unknown) => {
+            const ctx = context as {
+              dataset: { label: string };
+              parsed: { x: number; y: number };
+            };
+            const dataset = ctx.dataset.label;
+            const mood = ctx.parsed.x;
+            const productivity = ctx.parsed.y;
             return `${dataset}: Mood ${mood}/5, Productivity ${productivity}%`;
           },
         },

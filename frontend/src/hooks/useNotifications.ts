@@ -36,13 +36,14 @@ export function useNotifications() {
       body: message,
       tag: 'session-complete',
       requireInteraction: true,
-      actions: [
-        {
-          action: 'start-next',
-          title: sessionType === 'focus' ? 'Start Break' : 'Start Focus',
-        },
-        { action: 'dismiss', title: 'Dismiss' },
-      ],
+      // Note: actions are experimental and not supported in all browsers
+      // actions: [
+      //   {
+      //     action: 'start-next',
+      //     title: sessionType === 'focus' ? 'Start Break' : 'Start Focus',
+      //   },
+      //   { action: 'dismiss', title: 'Dismiss' },
+      // ],
     });
   };
 
