@@ -332,6 +332,54 @@ class BackendAPIClient:
             await self.session.close()
             self.session = None
 
+    async def store_ai_review(self, user_id: str, review_data: Dict) -> bool:
+        """
+        Store AI coach review data.
+
+        Args:
+            user_id: User identifier
+            review_data: Review data with summary, suggestions, tags, etc.
+
+        Returns:
+            True if successful, False otherwise
+        """
+        try:
+            activity_data = {
+                "user_id": user_id,
+                "activity_type": "ai_review",
+                "description": review_data.get("summary", "AI daily review"),
+                "duration_minutes": 0,  # Reviews don't have duration
+                "start_time": datetime.now().isoformat(),
+                "tags": review_data.get("tags", []),
+                "metadata": {
+                    "ai_review": True,
+                    "summary": review_data.get("summary", ""),
+                    "suggestions": review_data.get("suggestions", []),
+                    "productivity_score": review_data.get("productivity_score", 5),
+                    "analysis_type": "daily_git_review",
+                    "git_commits_analyzed": review_data.get("commits_analyzed", 0),
+                    "files_changed": review_data.get("files_changed", 0),
+                }
+            }
+
+            success = await self._send_to_backend(activity_data)
+            
+            if not success:
+                # Store offline for retry
+                await self._store_offline(activity_data)
+                
+            return success
+
+        except Exception as e:
+            print(f"  ⚠️ Error storing AI review: {e}")
+            await self._store_offline({
+                "user_id": user_id,
+                "review_data": review_data,
+                "timestamp": datetime.now().isoformat(),
+                "type": "ai_review"
+            })
+            return False
+
 
 # Test function for development
 if __name__ == "__main__":
@@ -376,6 +424,19 @@ if __name__ == "__main__":
         # Test storage (will go offline if backend not available)
         success = await client.store_analysis(test_commit_data)
         print(f"Storage result: {success}")
+
+        # Test AI review storage
+        test_review_data = {
+            "summary": "Reviewed changes in timer.js and settings.py",
+            "suggestions": ["Consider optimizing the timer function", "Check for edge cases in settings"],
+            "tags": ["ai-review", "bugfix", "timer"],
+            "productivity_score": 4.5,
+            "commits_analyzed": 3,
+            "files_changed": 2,
+        }
+
+        review_success = await client.store_ai_review("user_123", test_review_data)
+        print(f"AI Review storage result: {review_success}")
 
         await client.cleanup()
 
