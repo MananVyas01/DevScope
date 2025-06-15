@@ -1,0 +1,36 @@
+[
+  {
+    "timestamp": "2025-06-15T08:46:04.290456",
+    "data": {
+      "activity_type": "debugging",
+      "description": "AI Analysis: Fix keyword in message, targeted changes in state management",
+      "duration_minutes": 5,
+      "start_time": "2025-06-15T08:46:04.285427",
+      "tags": [
+        "ai-analyzed",
+        "confidence-85",
+        "bug-fixing",
+        "bugfix",
+        "ext-js"
+      ],
+      "metadata": {
+        "commit_id": "test123456789",
+        "commit_message": "fix: resolve timer state issue",
+        "ai_classification": "Bug Fixing",
+        "ai_confidence": 0.85,
+        "ai_reasoning": "Fix keyword in message, targeted changes in state management",
+        "ai_indicators": [],
+        "files_changed": 1,
+        "lines_added": 5,
+        "lines_deleted": 2,
+        "branch": "main",
+        "author": {
+          "name": "Test User",
+          "email": "test@example.com"
+        },
+        "is_merge": false
+      }
+    },
+    "retry_count": 0
+  }
+]

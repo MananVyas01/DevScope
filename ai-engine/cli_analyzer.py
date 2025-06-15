@@ -1,17 +1,23 @@
 #!/usr/bin/env python3
 """
-DevScope AI Activity Analyzer - CLI Tool
+DevScope AI Activity Analyzer - Enhanced CLI Tool
 
-This script analyzes Git commit logs and diffs using OpenAI GPT to classify
-developer productivity patterns and contexts.
+This script orchestrates the complete AI analysis pipeline:
+1. Parse recent Git commits and diffs
+2. Analyze commits using OpenAI GPT
+3. Store results in the backend database
+4. Handle offline caching and rate limiting
 
-Stage 4: AI Activity Analyzer
+Usage:
+    python cli_analyzer.py [--hours=24] [--dry-run] [--verbose]
 """
 
+import argparse
+import asyncio
 import os
 import sys
-import asyncio
-from datetime import datetime, timedelta
+from datetime import datetime
+from typing import List, Dict, Any
 from dotenv import load_dotenv
 
 # Load environment variables
@@ -57,22 +63,67 @@ async def main():
             print("✅ No new commits to analyze")
             return
         
-        # Step 2: Analyze commits with AI
-        print("\n🧠 Step 2: Analyzing commits with AI...")
-        analyzed_commits = []
+        # Check if we should use mock analysis
+        openai_api_key = os.getenv('OPENAI_API_KEY')
+        use_mock = not openai_api_key or openai_api_key == 'test-key-for-development'
+        if use_mock:
+            print("⚠️  Using mock analysis (OpenAI API key not configured)")
         
-        for i, commit in enumerate(commits):
-            print(f"Analyzing commit {i+1}/{len(commits)}: {commit['id'][:8]}")
+        # Mock analysis function
+        def mock_analysis(commit):
+            """Generate mock analysis for testing."""
+            message = commit['message'].lower()
             
-            analysis = await analyzer.analyze_commit(commit)
-            if analysis:
-                analyzed_commits.append({
-                    **commit,
-                    'analysis': analysis
-                })
-                print(f"  ✅ Classified as: {analysis['label']} (confidence: {analysis['confidence']:.2f})")
+            if 'fix' in message or 'bug' in message:
+                return {"label": "Bug Fixing", "confidence": 0.85, "reasoning": "Commit message indicates bug fixing"}
+            elif 'refactor' in message or 'clean' in message:
+                return {"label": "Refactoring", "confidence": 0.82, "reasoning": "Code improvement and refactoring"}
+            elif 'feat' in message or 'add' in message:
+                return {"label": "High Focus", "confidence": 0.88, "reasoning": "New feature development"}
+            elif 'test' in message:
+                return {"label": "Testing", "confidence": 0.80, "reasoning": "Test implementation"}
+            elif 'doc' in message or 'readme' in message:
+                return {"label": "Documentation", "confidence": 0.83, "reasoning": "Documentation updates"}
             else:
-                print(f"  ⚠️ Failed to analyze commit")
+                return {"label": "General Development", "confidence": 0.75, "reasoning": "General development work"}
+        
+        # Step 2: Analyze commits with AI or mock
+        print(f"\n🧠 Step 2: {'Mock analyzing' if use_mock else 'Analyzing'} commits with {'test classifier' if use_mock else 'AI'}...")
+        
+        analyzed_commits = []
+        for i, commit in enumerate(commits, 1):
+            print(f"Analyzing commit {i}/{len(commits)}: {commit['short_id']}")
+            
+            try:
+                if use_mock:
+                    # Use mock analysis
+                    analysis_result = mock_analysis(commit)
+                    print(f"  ✅ Mock classified as: {analysis_result['label']} (confidence: {analysis_result['confidence']:.2f})")
+                else:
+                    # Use real OpenAI analysis
+                    analysis_result = await analyzer.analyze_commit(commit)
+                    if analysis_result:
+                        print(f"  ✅ AI classified as: {analysis_result['label']} (confidence: {analysis_result['confidence']:.2f})")
+                    else:
+                        print(f"  ⚠️ Failed to analyze commit")
+                        continue
+                
+                # Store successful analysis
+                analyzed_commits.append({
+                    'commit_sha': commit['id'],
+                    'commit_message': commit['message'],
+                    'commit_author': commit['author'],
+                    'commit_date': commit['timestamp'],
+                    'analysis': analysis_result,
+                    'analyzed_at': datetime.now().isoformat()
+                })
+                
+            except Exception as e:
+                print(f"  ❌ Error analyzing commit: {e}")
+                continue
+                
+            except Exception as e:
+                print(f"  ❌ Error analyzing commit: {str(e)}")
         
         # Step 3: Store results in database
         print(f"\n💾 Step 3: Storing {len(analyzed_commits)} analysis results...")
