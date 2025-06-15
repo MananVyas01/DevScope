@@ -1,0 +1,101 @@
+{
+  "focus": {
+    "weekly": {
+      "labels": ["Mon", "Tue", "Wed", "Thu", "Fri", "Sat", "Sun"],
+      "datasets": [
+        {
+          "label": "Focus Hours",
+          "data": [6.5, 4.2, 8.1, 5.7, 7.3, 3.2, 2.1],
+          "borderColor": "rgb(59, 130, 246)",
+          "backgroundColor": "rgba(59, 130, 246, 0.1)",
+          "tension": 0.4,
+          "fill": true
+        }
+      ]
+    }
+  },
+  "moodBugCorrelation": {
+    "labels": ["Mood 1", "Mood 2", "Mood 3", "Mood 4", "Mood 5"],
+    "datasets": [
+      {
+        "label": "Bug-related Commits",
+        "data": [8, 6, 3, 2, 1],
+        "backgroundColor": [
+          "rgba(239, 68, 68, 0.8)",
+          "rgba(245, 101, 101, 0.8)",
+          "rgba(251, 146, 60, 0.8)",
+          "rgba(34, 197, 94, 0.8)",
+          "rgba(59, 130, 246, 0.8)"
+        ]
+      }
+    ]
+  },
+  "languageUsage": {
+    "labels": ["TypeScript", "Python", "JavaScript", "CSS", "HTML"],
+    "datasets": [
+      {
+        "label": "Lines of Code",
+        "data": [45, 25, 15, 10, 5],
+        "backgroundColor": [
+          "rgba(59, 130, 246, 0.8)",
+          "rgba(34, 197, 94, 0.8)",
+          "rgba(251, 191, 36, 0.8)",
+          "rgba(139, 92, 246, 0.8)",
+          "rgba(236, 72, 153, 0.8)"
+        ]
+      }
+    ]
+  },
+  "githubActivity": {
+    "labels": ["Mon", "Tue", "Wed", "Thu", "Fri", "Sat", "Sun"],
+    "datasets": [
+      {
+        "label": "Pushes",
+        "data": [3, 2, 5, 4, 6, 1, 0],
+        "backgroundColor": "rgba(59, 130, 246, 0.8)"
+      },
+      {
+        "label": "Pull Requests",
+        "data": [1, 0, 2, 1, 3, 0, 0],
+        "backgroundColor": "rgba(34, 197, 94, 0.8)"
+      }
+    ]
+  },
+  "moodProductivity": {
+    "datasets": [
+      {
+        "label": "High Focus",
+        "data": [
+          { "x": 4.5, "y": 92 },
+          { "x": 4.2, "y": 88 },
+          { "x": 4.8, "y": 95 },
+          { "x": 4.3, "y": 89 },
+          { "x": 4.7, "y": 93 }
+        ],
+        "backgroundColor": "rgba(34, 197, 94, 0.8)"
+      },
+      {
+        "label": "Distracted",
+        "data": [
+          { "x": 2.1, "y": 45 },
+          { "x": 2.5, "y": 52 },
+          { "x": 2.8, "y": 48 },
+          { "x": 2.2, "y": 41 },
+          { "x": 2.6, "y": 47 }
+        ],
+        "backgroundColor": "rgba(251, 191, 36, 0.8)"
+      },
+      {
+        "label": "Bug Fixing",
+        "data": [
+          { "x": 3.1, "y": 68 },
+          { "x": 3.5, "y": 72 },
+          { "x": 3.2, "y": 70 },
+          { "x": 3.8, "y": 75 },
+          { "x": 3.4, "y": 71 }
+        ],
+        "backgroundColor": "rgba(239, 68, 68, 0.8)"
+      }
+    ]
+  }
+}
