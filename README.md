@@ -1,6 +1,6 @@
 # 🎯 DevScope - Developer Productivity, Reimagined
 
-[![Development Stage](https://img.shields.io/badge/Status-Stage%203%20Complete-success?style=for-the-badge)](#-current-development-stage)
+[![Development Stage](https://img.shields.io/badge/Status-Stage%205%20Complete-success?style=for-the-badge)](#-current-development-stage)
 [![TypeScript](https://img.shields.io/badge/TypeScript-007ACC?style=for-the-badge&logo=typescript&logoColor=white)](#)
 [![Next.js](https://img.shields.io/badge/Next.js-000000?style=for-the-badge&logo=next.js&logoColor=white)](#)
 [![FastAPI](https://img.shields.io/badge/FastAPI-009688?style=for-the-badge&logo=fastapi&logoColor=white)](#)
@@ -20,6 +20,8 @@ DevScope is a comprehensive **full-stack monorepo** designed to revolutionize de
 - **📱 Multi-Platform Support** - Web app, desktop app, and VS Code extension
 - **🔐 Privacy-Focused** - Local data storage with optional cloud sync
 - **🤖 AI-Powered Insights** - Machine learning for productivity optimization
+- **🐙 GitHub Integration** - Automatic webhook processing for commit analysis
+- **🔌 VSCode Extension** - Real-time productivity tracking in your editor
 
 ---
 
@@ -48,21 +50,52 @@ DevScope is a comprehensive **full-stack monorepo** designed to revolutionize de
 - **Language**: Rust + TypeScript
 - **Platform**: Cross-platform (Windows, macOS, Linux)
 
-### **VS Code Extension** (Planned 📋)
+### **VS Code Extension** (Production Ready ✅)
 
 - **Language**: TypeScript
 - **Integration**: VS Code API
-- **Features**: Workflow tracking, time analytics
+- **Features**: Activity tracking, productivity sidebar, Git integration
+- **Backend Sync**: Real-time session synchronization
 
-### **AI Engine** (Planned 🤖)
+### **AI Engine** (Production Ready ✅)
 
 - **Language**: Python
-- **ML Libraries**: TensorFlow/PyTorch
-- **Features**: Productivity insights, pattern recognition
+- **ML Libraries**: OpenAI GPT integration
+- **Features**: Commit analysis, productivity insights, activity classification
 
 ---
 
 ## 🎯 **Current Development Stage**
+
+### **Stage 5: GitHub & VSCode Integration** ✅ **COMPLETE**
+
+**Delivered Features:**
+
+#### 🔌 **VSCode Extension**
+
+- ✅ **Activity Tracking** - Real-time file monitoring and session detection
+- ✅ **Productivity Sidebar** - Live productivity metrics and session stats
+- ✅ **Git Integration** - Repository context and branch tracking
+- ✅ **Backend Sync** - Automatic synchronization with DevScope backend
+- ✅ **Idle Detection** - Smart idle time tracking and session management
+- ✅ **Error Handling** - Robust offline support and error recovery
+
+#### 🐙 **GitHub App Integration**
+
+- ✅ **Webhook Processing** - Automated push, PR, and review event handling
+- ✅ **AI Commit Analysis** - GPT-powered commit message and diff analysis
+- ✅ **Security** - GitHub signature verification and secure webhook handling
+- ✅ **Rate Limiting** - Intelligent request management and retry logic
+- ✅ **Database Integration** - Full activity storage and retrieval
+
+#### 🚀 **Backend Enhancements**
+
+- ✅ **VSCode API Endpoints** - Complete `/vscode/*` API suite
+- ✅ **GitHub Event Processing** - Enhanced `/github-events` handling
+- ✅ **Authentication Improvements** - Dev/prod mode support
+- ✅ **Error Handling** - Comprehensive logging and monitoring
+
+### **Previous Stages:**
 
 ### **Stage 3: Smart Focus Timer + Mood Tracker** ✅ **COMPLETE**
 
@@ -106,11 +139,15 @@ DevScope/
 │   ├── src/              # React frontend
 │   └── src-tauri/        # Rust backend
 │
-├── 🔌 extension/         # VS Code extension (📋 Planned)
-│   └── src/              # TypeScript extension
+├── 🔌 extension/         # VS Code extension (✅ Complete)
+│   ├── src/              # TypeScript extension code
+│   ├── package.json      # Extension manifest
+│   └── README.md         # Extension documentation
 │
-└── 🤖 ai-engine/         # ML analytics (📋 Planned)
-    └── src/              # Python ML pipeline
+└── 🤖 ai-engine/         # ML analytics (✅ Complete)
+    ├── analyzer.py       # AI commit analysis
+    ├── git_parser.py     # Git repository processing
+    └── main.py           # Analysis pipeline
 ```
 
 ---
@@ -151,6 +188,9 @@ DevScope/
 
    # Backend
    cp backend/.env.example backend/.env
+
+   # AI Engine (optional)
+   cp ai-engine/.env.example ai-engine/.env
    ```
 
 4. **Start development servers**
@@ -161,9 +201,22 @@ DevScope/
 
    # Terminal 2: Frontend
    cd frontend && npm run dev
+
+   # Terminal 3: AI Engine (optional)
+   cd ai-engine && python main.py
    ```
 
-5. **Open your browser**
+5. **VSCode Extension (optional)**
+
+   ```bash
+   # Install extension in development mode
+   cd extension
+   npm install
+   npm run compile
+   # Then press F5 in VSCode to run extension
+   ```
+
+6. **Open your browser**
    - Frontend: `http://localhost:3000`
    - Backend API: `http://localhost:8000/docs`
 
@@ -185,6 +238,21 @@ DevScope/
 - **Correlation Analysis**: Understand relationships between mood and productivity
 - **Historical Trends**: Track patterns over time with beautiful charts
 
+### **VSCode Extension Integration**
+
+- **Real-time Activity Tracking**: Monitors file changes and coding sessions
+- **Productivity Sidebar**: Live metrics panel with daily statistics
+- **Git Integration**: Automatic repository and branch context detection
+- **Session Management**: Smart idle detection and session boundaries
+- **Offline Support**: Works without internet, syncs when available
+
+### **GitHub App Integration**
+
+- **Automatic Webhook Processing**: Handles push, PR, and review events
+- **AI-Powered Commit Analysis**: GPT-based analysis of commit quality and patterns
+- **Security**: GitHub signature verification and secure webhook handling
+- **Activity Correlation**: Links GitHub activity with productivity sessions
+
 ### **Offline-First Architecture**
 
 - **Complete Offline Support**: Works without internet connection
@@ -201,20 +269,20 @@ DevScope/
 - **Stage 1**: Project setup and architecture design
 - **Stage 2**: Backend API with authentication and database
 - **Stage 3**: Smart Focus Timer with mood tracking
+- **Stage 4**: AI-powered activity analysis and commit insights
+- **Stage 5**: GitHub App integration and VSCode extension
 
 ### **🚧 Current Development**
 
-- **Stage 4**: Desktop application with Tauri
-- **Stage 5**: VS Code extension integration
-- **Stage 6**: AI-powered productivity insights
+- **Stage 6**: Desktop application enhancement with Tauri
 
 ### **📋 Planned Features**
 
-- **GitHub Integration**: Automatic commit and PR activity tracking
-- **Team Analytics**: Collaborative productivity insights
+- **Enhanced Team Analytics**: Collaborative productivity insights
 - **Calendar Integration**: Meeting and schedule awareness
 - **Custom Workflows**: Personalized productivity patterns
 - **Export & Reporting**: Comprehensive productivity reports
+- **Mobile App**: React Native productivity companion
 
 ---
 
@@ -263,9 +331,12 @@ This project is currently in **active development**. Contributions, suggestions,
 
 ### **Project Scale**
 
-- **10+ API endpoints** with full CRUD operations
-- **20+ React components** with TypeScript
-- **5+ database models** with relationships
+- **25+ API endpoints** with full CRUD operations
+- **30+ React components** with TypeScript
+- **8+ database models** with relationships
+- **Complete VSCode extension** with 600+ lines of TypeScript
+- **AI-powered analysis engine** with GPT integration
+- **GitHub App integration** with webhook processing
 - **Offline-first architecture** with sync mechanisms
 - **Production deployment** configuration
 - **Comprehensive testing** strategy
@@ -275,24 +346,28 @@ This project is currently in **active development**. Contributions, suggestions,
 - **Backend**: Python, FastAPI, SQLAlchemy, PostgreSQL, JWT Authentication
 - **Frontend**: React, Next.js, TypeScript, Tailwind CSS, Chart.js
 - **Desktop**: Rust, Tauri, Cross-platform development
+- **VSCode Extension**: TypeScript, VSCode API, Real-time tracking
+- **AI/ML**: OpenAI GPT integration, Natural language processing
+- **GitHub Integration**: Webhooks, App development, API integration
 - **DevOps**: Docker, Railway, Vercel, Environment management
 - **Database**: PostgreSQL, SQLAlchemy ORM, Database design
 - **API**: RESTful design, OpenAPI documentation, Rate limiting
-- **Security**: JWT tokens, CORS, Input validation, Rate limiting
+- **Security**: JWT tokens, CORS, Input validation, Webhook signatures
 
 ---
 
 ## 📊 **Project Status**
 
-| Component             | Status         | Progress | Description                      |
-| --------------------- | -------------- | -------- | -------------------------------- |
-| **Backend API**       | ✅ Complete    | 100%     | FastAPI with full authentication |
-| **Frontend App**      | ✅ Complete    | 100%     | Next.js with focus timer         |
-| **Database**          | ✅ Complete    | 100%     | PostgreSQL with models           |
-| **Authentication**    | ✅ Complete    | 100%     | Supabase integration             |
-| **Desktop App**       | 🚧 In Progress | 30%      | Tauri foundation                 |
-| **VS Code Extension** | 📋 Planned     | 10%      | Basic structure                  |
-| **AI Engine**         | 📋 Planned     | 5%       | Requirements defined             |
+| Component              | Status        | Progress | Description                      |
+| ---------------------- | ------------- | -------- | -------------------------------- |
+| **Backend API**        | ✅ Complete   | 100%     | FastAPI with full authentication |
+| **Frontend App**       | ✅ Complete   | 100%     | Next.js with focus timer         |
+| **Database**           | ✅ Complete   | 100%     | PostgreSQL with models           |
+| **Authentication**     | ✅ Complete   | 100%     | Supabase integration             |
+| **AI Engine**          | ✅ Complete   | 100%     | GPT-powered commit analysis      |
+| **GitHub Integration** | ✅ Complete   | 100%     | Webhook processing & analysis    |
+| **VS Code Extension**  | ✅ Complete   | 100%     | Full productivity tracking       |
+| **Desktop App**        | � In Progress | 30%      | Tauri foundation                 |
 
 ---
 
@@ -305,8 +380,8 @@ This project is licensed under the MIT License - see the [LICENSE](LICENSE) file
 ## 📞 **Contact**
 
 **Project Status**: Active Development  
-**Stage**: 3 Complete (Production Ready Focus Timer)  
-**Next Milestone**: Desktop Application Development
+**Stage**: 5 Complete (GitHub & VSCode Integration)  
+**Next Milestone**: Enhanced Desktop Application
 
 For questions, collaboration, or recruitment inquiries, please reach out through GitHub Issues or direct contact.
 
