@@ -45,7 +45,7 @@ async def test_database_initialization():
         async with engine.begin() as conn:
             result = await conn.execute("SELECT 1")
             print("✅ Database connection test successful")
-        
+
         return True
     except Exception as e:
         print(f"❌ Database initialization failed: {e}")
@@ -57,7 +57,7 @@ async def main():
     """Run all tests."""
     print("🚀 DevScope API Test Suite")
     print("=" * 40)
-    
+
     # Test imports
     print("\n📦 Testing Imports...")
     imports_ok = await test_basic_import()
