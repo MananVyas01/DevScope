@@ -18,10 +18,12 @@ class SupabaseAuth:
         """Initialize Supabase client."""
         try:
             # Only create real Supabase clients if we have valid URLs
-            if (settings.SUPABASE_URL.startswith('https://') and 
-                settings.SUPABASE_SERVICE_KEY != 'test-service-key' and
-                settings.SUPABASE_ANON_KEY != 'test-anon-key'):
-                
+            if (
+                settings.SUPABASE_URL.startswith("https://")
+                and settings.SUPABASE_SERVICE_KEY != "test-service-key"
+                and settings.SUPABASE_ANON_KEY != "test-anon-key"
+            ):
+
                 self.client: Client = create_client(
                     settings.SUPABASE_URL, settings.SUPABASE_SERVICE_KEY
                 )
@@ -31,13 +33,17 @@ class SupabaseAuth:
                 self.is_configured = True
             else:
                 # Development/test mode - no real Supabase connection
-                logger.info("Supabase auth running in development mode (no real connection)")
+                logger.info(
+                    "Supabase auth running in development mode (no real connection)"
+                )
                 self.client = None
                 self.anon_client = None
                 self.is_configured = False
-                
+
         except Exception as e:
-            logger.warning(f"Failed to initialize Supabase client: {e}. Running in offline mode.")
+            logger.warning(
+                f"Failed to initialize Supabase client: {e}. Running in offline mode."
+            )
             self.client = None
             self.anon_client = None
             self.is_configured = False
@@ -48,17 +54,17 @@ class SupabaseAuth:
         """
         if not self.is_configured:
             # In development mode, return a mock user
-            logger.warning("Supabase not configured - returning mock user for development")
+            logger.warning(
+                "Supabase not configured - returning mock user for development"
+            )
             return {
                 "user": {
                     "id": "dev-user-id",
                     "email": "dev@example.com",
-                    "user_metadata": {
-                        "full_name": "Development User"
-                    }
+                    "user_metadata": {"full_name": "Development User"},
                 }
             }
-            
+
         try:
             # Decode the JWT token
             payload = jwt.decode(
@@ -92,7 +98,7 @@ class SupabaseAuth:
                 "created_at": "2023-01-01T00:00:00Z",
                 "updated_at": "2023-01-01T00:00:00Z",
             }
-            
+
         try:
             result = self.client.auth.admin.get_user_by_id(user_id)
             if result.user:
@@ -123,7 +129,7 @@ class SupabaseAuth:
                 "user_metadata": user_metadata or {},
                 "created_at": "2023-01-01T00:00:00Z",
             }
-            
+
         try:
             result = self.client.auth.admin.create_user(
                 {
@@ -159,7 +165,7 @@ class SupabaseAuth:
         if not self.is_configured:
             logger.warning("Supabase not configured - mock metadata update")
             return True
-            
+
         try:
             result = self.client.auth.admin.update_user_by_id(
                 user_id, {"user_metadata": metadata}
@@ -181,7 +187,7 @@ class SupabaseAuth:
         if not self.is_configured:
             logger.warning("Supabase not configured - mock user deletion")
             return True
-            
+
         try:
             self.client.auth.admin.delete_user(user_id)
             logger.info("User deleted", user_id=user_id)
@@ -208,7 +214,7 @@ class SupabaseAuth:
                     "user_metadata": {"full_name": "Development User"},
                 },
             }
-            
+
         try:
             result = self.anon_client.auth.refresh_session(refresh_token)
             if result.session:

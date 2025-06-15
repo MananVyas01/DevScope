@@ -50,7 +50,9 @@ async def login(user_data: UserLogin, request: Request) -> Any:
 
 @router.post("/refresh", response_model=Token)
 @limiter.limit("10/minute")
-async def refresh_token(request: Request, current_user: User = Depends(get_current_user)) -> Any:
+async def refresh_token(
+    request: Request, current_user: User = Depends(get_current_user)
+) -> Any:
     """Refresh access token."""
     try:
         # In a real implementation, you'd generate a new token
@@ -68,7 +70,9 @@ async def refresh_token(request: Request, current_user: User = Depends(get_curre
 
 @router.post("/verify")
 @limiter.limit("20/minute")
-async def verify_token(request: Request, current_user: User = Depends(get_current_user)) -> Any:
+async def verify_token(
+    request: Request, current_user: User = Depends(get_current_user)
+) -> Any:
     """Verify if the current token is valid."""
     return {"valid": True, "user": current_user, "verified_at": datetime.utcnow()}
 
