@@ -101,7 +101,7 @@ class DevScopeTracker {
       const workspaceFolders = vscode.workspace.workspaceFolders;
       if (!workspaceFolders || !this.gitExtension) return undefined;
 
-      const api = (this.gitExtension as any)?.exports?.getAPI(1);
+      const api = this.gitExtension?.exports?.getAPI(1);
       if (!api) return undefined;
 
       const repo = api.repositories[0];
@@ -274,16 +274,25 @@ class DevScopeTracker {
       } else {
         throw new Error(`HTTP ${response.status}: ${response.statusText}`);
       }
-    } catch (error: any) {
-      // eslint-disable-line @typescript-eslint/no-explicit-any
+    } catch (error: unknown) {
       let errorMessage = 'Unknown error';
 
-      if (error.code === 'ECONNREFUSED') {
+      const errorObj = error as {
+        code?: string;
+        response?: {
+          status: number;
+          data?: { message: string };
+          statusText: string;
+        };
+        message?: string;
+      };
+
+      if (errorObj.code === 'ECONNREFUSED') {
         errorMessage = 'Connection refused - is the DevScope backend running?';
-      } else if (error.response) {
-        errorMessage = `HTTP ${error.response.status}: ${error.response.data?.message || error.response.statusText}`;
-      } else if (error.message) {
-        errorMessage = error.message;
+      } else if (errorObj.response) {
+        errorMessage = `HTTP ${errorObj.response.status}: ${errorObj.response.data?.message || errorObj.response.statusText}`;
+      } else if (errorObj.message) {
+        errorMessage = errorObj.message;
       }
 
       this.outputChannel.appendLine(`❌ Sync failed: ${errorMessage}`);

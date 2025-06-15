@@ -19,6 +19,28 @@ export default [
       parser: typescriptParser,
       ecmaVersion: 2020,
       sourceType: 'module',
+      globals: {
+        // Browser globals
+        window: 'readonly',
+        document: 'readonly',
+        console: 'readonly',
+        setTimeout: 'readonly',
+        setInterval: 'readonly',
+        clearTimeout: 'readonly',
+        clearInterval: 'readonly',
+        fetch: 'readonly',
+        localStorage: 'readonly',
+        navigator: 'readonly',
+        Notification: 'readonly',
+        NotificationOptions: 'readonly',
+        RequestInit: 'readonly',
+        // Node.js globals
+        process: 'readonly',
+        global: 'readonly',
+        Buffer: 'readonly',
+        __dirname: 'readonly',
+        __filename: 'readonly',
+      },
     },
     plugins: {
       '@typescript-eslint': typescript,

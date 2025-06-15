@@ -1,23 +1,58 @@
-'use client'
+'use client';
 
-import { useState } from 'react'
-import { X, Smile, Meh, Frown, HeartCrack, PartyPopper } from 'lucide-react'
-import { api, OfflineStorage, useNetworkStatus, type MoodData } from '@/lib/api'
+import { useState } from 'react';
+import { X, Smile, Meh, Frown, HeartCrack, PartyPopper } from 'lucide-react';
+import {
+  api,
+  OfflineStorage,
+  useNetworkStatus,
+  type MoodData,
+} from '@/lib/api';
 
 interface MoodTrackerModalProps {
-  isOpen: boolean
-  onClose: () => void
-  sessionType: 'focus' | 'break'
-  sessionDuration: number
+  isOpen: boolean;
+  onClose: () => void;
+  sessionType: 'focus' | 'break';
+  sessionDuration: number;
 }
 
 const moodOptions = [
-  { score: 1, icon: HeartCrack, label: 'Very Bad', color: 'text-red-600', bg: 'bg-red-100 hover:bg-red-200' },
-  { score: 2, icon: Frown, label: 'Bad', color: 'text-orange-600', bg: 'bg-orange-100 hover:bg-orange-200' },
-  { score: 3, icon: Meh, label: 'Okay', color: 'text-yellow-600', bg: 'bg-yellow-100 hover:bg-yellow-200' },
-  { score: 4, icon: Smile, label: 'Good', color: 'text-green-600', bg: 'bg-green-100 hover:bg-green-200' },
-  { score: 5, icon: PartyPopper, label: 'Excellent', color: 'text-blue-600', bg: 'bg-blue-100 hover:bg-blue-200' },
-]
+  {
+    score: 1,
+    icon: HeartCrack,
+    label: 'Very Bad',
+    color: 'text-red-600',
+    bg: 'bg-red-100 hover:bg-red-200',
+  },
+  {
+    score: 2,
+    icon: Frown,
+    label: 'Bad',
+    color: 'text-orange-600',
+    bg: 'bg-orange-100 hover:bg-orange-200',
+  },
+  {
+    score: 3,
+    icon: Meh,
+    label: 'Okay',
+    color: 'text-yellow-600',
+    bg: 'bg-yellow-100 hover:bg-yellow-200',
+  },
+  {
+    score: 4,
+    icon: Smile,
+    label: 'Good',
+    color: 'text-green-600',
+    bg: 'bg-green-100 hover:bg-green-200',
+  },
+  {
+    score: 5,
+    icon: PartyPopper,
+    label: 'Excellent',
+    color: 'text-blue-600',
+    bg: 'bg-blue-100 hover:bg-blue-200',
+  },
+];
 
 const energyLevels = [
   { value: 1, label: 'Very Low' },
@@ -25,7 +60,7 @@ const energyLevels = [
   { value: 3, label: 'Moderate' },
   { value: 4, label: 'High' },
   { value: 5, label: 'Very High' },
-]
+];
 
 const stressLevels = [
   { value: 1, label: 'Very Low' },
@@ -33,25 +68,25 @@ const stressLevels = [
   { value: 3, label: 'Moderate' },
   { value: 4, label: 'High' },
   { value: 5, label: 'Very High' },
-]
+];
 
-export default function MoodTrackerModal({ 
-  isOpen, 
-  onClose, 
-  sessionType, 
-  sessionDuration 
+export default function MoodTrackerModal({
+  isOpen,
+  onClose,
+  sessionType,
+  sessionDuration,
 }: MoodTrackerModalProps) {
-  const isOnline = useNetworkStatus()
-  const [selectedMood, setSelectedMood] = useState<number | null>(null)
-  const [energyLevel, setEnergyLevel] = useState<number>(3)
-  const [stressLevel, setStressLevel] = useState<number>(3)
-  const [notes, setNotes] = useState('')
-  const [isSubmitting, setIsSubmitting] = useState(false)
+  const isOnline = useNetworkStatus();
+  const [selectedMood, setSelectedMood] = useState<number | null>(null);
+  const [energyLevel, setEnergyLevel] = useState<number>(3);
+  const [stressLevel, setStressLevel] = useState<number>(3);
+  const [notes, setNotes] = useState('');
+  const [isSubmitting, setIsSubmitting] = useState(false);
 
   const handleSubmit = async () => {
-    if (selectedMood === null) return
+    if (selectedMood === null) return;
 
-    setIsSubmitting(true)
+    setIsSubmitting(true);
 
     try {
       const moodData: MoodData = {
@@ -59,50 +94,58 @@ export default function MoodTrackerModal({
         energy_level: energyLevel,
         stress_level: stressLevel,
         notes: notes.trim() || undefined,
-        tags: [sessionType, 'post-session', `${Math.round(sessionDuration / 60)}min`]
-      }
+        tags: [
+          sessionType,
+          'post-session',
+          `${Math.round(sessionDuration / 60)}min`,
+        ],
+      };
 
       if (isOnline) {
-        await api.createMood(moodData)
+        await api.createMood(moodData);
         // Try to sync any offline data
-        await OfflineStorage.syncMoods()
-        OfflineStorage.clearSyncedData()
+        await OfflineStorage.syncMoods();
+        OfflineStorage.clearSyncedData();
       } else {
-        OfflineStorage.storeMood(moodData)
+        OfflineStorage.storeMood(moodData);
       }
 
-      onClose()
-      resetForm()
+      onClose();
+      resetForm();
     } catch (error) {
-      console.error('Failed to submit mood:', error)
+      console.error('Failed to submit mood:', error);
       // Store offline even if online submission failed
       OfflineStorage.storeMood({
         mood_score: selectedMood,
         energy_level: energyLevel,
         stress_level: stressLevel,
         notes: notes.trim() || undefined,
-        tags: [sessionType, 'post-session', `${Math.round(sessionDuration / 60)}min`]
-      })
-      onClose()
-      resetForm()
+        tags: [
+          sessionType,
+          'post-session',
+          `${Math.round(sessionDuration / 60)}min`,
+        ],
+      });
+      onClose();
+      resetForm();
     } finally {
-      setIsSubmitting(false)
+      setIsSubmitting(false);
     }
-  }
+  };
 
   const resetForm = () => {
-    setSelectedMood(null)
-    setEnergyLevel(3)
-    setStressLevel(3)
-    setNotes('')
-  }
+    setSelectedMood(null);
+    setEnergyLevel(3);
+    setStressLevel(3);
+    setNotes('');
+  };
 
   const handleClose = () => {
-    onClose()
-    resetForm()
-  }
+    onClose();
+    resetForm();
+  };
 
-  if (!isOpen) return null
+  if (!isOpen) return null;
 
   return (
     <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50 p-4">
@@ -114,7 +157,8 @@ export default function MoodTrackerModal({
               How are you feeling?
             </h2>
             <p className="text-sm text-gray-600 dark:text-gray-400 mt-1">
-              After your {sessionType} session ({Math.round(sessionDuration / 60)} minutes)
+              After your {sessionType} session (
+              {Math.round(sessionDuration / 60)} minutes)
             </p>
           </div>
           <button
@@ -133,8 +177,8 @@ export default function MoodTrackerModal({
               Overall Mood
             </label>
             <div className="grid grid-cols-5 gap-2">
-              {moodOptions.map((mood) => {
-                const Icon = mood.icon
+              {moodOptions.map(mood => {
+                const Icon = mood.icon;
                 return (
                   <button
                     key={mood.score}
@@ -150,7 +194,7 @@ export default function MoodTrackerModal({
                       {mood.label}
                     </div>
                   </button>
-                )
+                );
               })}
             </div>
           </div>
@@ -166,12 +210,19 @@ export default function MoodTrackerModal({
                 min="1"
                 max="5"
                 value={energyLevel}
-                onChange={(e) => setEnergyLevel(Number(e.target.value))}
+                onChange={e => setEnergyLevel(Number(e.target.value))}
                 className="w-full h-2 bg-gray-200 rounded-lg appearance-none cursor-pointer dark:bg-gray-700"
               />
               <div className="flex justify-between text-sm text-gray-600 dark:text-gray-400">
-                {energyLevels.map((level) => (
-                  <span key={level.value} className={energyLevel === level.value ? 'font-medium text-blue-600 dark:text-blue-400' : ''}>
+                {energyLevels.map(level => (
+                  <span
+                    key={level.value}
+                    className={
+                      energyLevel === level.value
+                        ? 'font-medium text-blue-600 dark:text-blue-400'
+                        : ''
+                    }
+                  >
                     {level.label}
                   </span>
                 ))}
@@ -190,12 +241,19 @@ export default function MoodTrackerModal({
                 min="1"
                 max="5"
                 value={stressLevel}
-                onChange={(e) => setStressLevel(Number(e.target.value))}
+                onChange={e => setStressLevel(Number(e.target.value))}
                 className="w-full h-2 bg-gray-200 rounded-lg appearance-none cursor-pointer dark:bg-gray-700"
               />
               <div className="flex justify-between text-sm text-gray-600 dark:text-gray-400">
-                {stressLevels.map((level) => (
-                  <span key={level.value} className={stressLevel === level.value ? 'font-medium text-red-600 dark:text-red-400' : ''}>
+                {stressLevels.map(level => (
+                  <span
+                    key={level.value}
+                    className={
+                      stressLevel === level.value
+                        ? 'font-medium text-red-600 dark:text-red-400'
+                        : ''
+                    }
+                  >
                     {level.label}
                   </span>
                 ))}
@@ -210,7 +268,7 @@ export default function MoodTrackerModal({
             </label>
             <textarea
               value={notes}
-              onChange={(e) => setNotes(e.target.value)}
+              onChange={e => setNotes(e.target.value)}
               placeholder="How was your session? Any insights or thoughts?"
               rows={3}
               className="w-full px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-md shadow-sm placeholder-gray-400 dark:placeholder-gray-500 focus:outline-none focus:ring-blue-500 focus:border-blue-500 dark:bg-gray-700 dark:text-white"
@@ -221,7 +279,8 @@ export default function MoodTrackerModal({
           {!isOnline && (
             <div className="bg-yellow-50 dark:bg-yellow-900/20 border border-yellow-200 dark:border-yellow-800 rounded-md p-3">
               <p className="text-sm text-yellow-800 dark:text-yellow-200">
-                You're offline. Your mood data will be saved locally and synced when you're back online.
+                You&apos;re offline. Your mood data will be saved locally and
+                synced when you&apos;re back online.
               </p>
             </div>
           )}
@@ -245,5 +304,5 @@ export default function MoodTrackerModal({
         </div>
       </div>
     </div>
-  )
+  );
 }

@@ -1,4 +1,3 @@
-/* eslint-disable no-undef */
 'use client';
 
 import { useState, useEffect, useCallback, useRef } from 'react';
@@ -120,7 +119,13 @@ export default function FocusTimer() {
         showActivityReminder();
       }
     }, INACTIVITY_THRESHOLD);
-  }, [isActive]);
+  }, [
+    isActive,
+    status,
+    sessionType,
+    showActivityReminder,
+    INACTIVITY_THRESHOLD,
+  ]);
 
   // Set up activity listeners
   useEffect(() => {
@@ -156,7 +161,7 @@ export default function FocusTimer() {
         console.error('Failed to sync offline data on mount:', error);
       });
     }
-  }, []);
+  }, [isOnline, user]);
 
   // Generate session ID
   const generateSessionId = () => {

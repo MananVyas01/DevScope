@@ -1,4 +1,3 @@
-/* eslint-disable no-undef */
 'use client';
 
 import React from 'react';
