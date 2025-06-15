@@ -303,7 +303,7 @@ if __name__ == "__main__":
     print(f"\nFound {len(commits)} recent commits")
 
     for i, commit in enumerate(commits[:3]):  # Show first 3 commits
-        print(f"\nCommit {i+1}:")
+        print(f"\nCommit {i + 1}:")
         print(f"  ID: {commit['short_id']}")
         print(f"  Message: {commit['message'][:60]}...")
         print(f"  Type: {commit['commit_type']}")
