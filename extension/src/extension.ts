@@ -403,9 +403,10 @@ class DevScopeSidebarProvider implements vscode.TreeDataProvider<SidebarItem> {
     SidebarItem | undefined | null | void
   > = this._onDidChangeTreeData.event;
 
-  // eslint-disable-next-line no-unused-vars
   constructor(
+    // eslint-disable-next-line no-unused-vars
     private _context: vscode.ExtensionContext,
+    // eslint-disable-next-line no-unused-vars
     private _tracker: DevScopeTracker
   ) {
     // Constructor parameters stored as private properties
