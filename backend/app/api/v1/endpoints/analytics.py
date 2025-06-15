@@ -63,7 +63,7 @@ async def get_dashboard_analytics(
 
     # Active projects count
     active_projects_stmt = select(func.count(Project.id)).where(
-        and_(Project.user_id == current_user.id, Project.is_active == True)
+        and_(Project.user_id == current_user.id, Project.is_active)
     )
     active_projects_count = (await db.execute(active_projects_stmt)).scalar()
 

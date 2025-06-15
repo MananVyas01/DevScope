@@ -17,6 +17,7 @@ from slowapi.util import get_remote_address
 from app.config import settings
 from app.middleware.auth import AuthMiddleware
 from app.middleware.logging import LoggingMiddleware
+from app.api.v1.api import api_router
 
 # Configure structured logging
 structlog.configure(
@@ -135,8 +136,6 @@ async def api_health_check():
 
 
 # Include API routers
-from app.api.v1.api import api_router
-
 app.include_router(api_router, prefix=settings.API_V1_STR)
 
 
