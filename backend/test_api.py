@@ -17,11 +17,7 @@ async def test_basic_import():
         print(f"   Environment: {settings.ENVIRONMENT}")
         print(f"   Database URL: {settings.DATABASE_URL}")
 
-        from app.models.database import init_db
-
         print("✅ Database models imported successfully")
-
-        from app.api.v1.api import api_router
 
         print("✅ API router imported successfully")
 

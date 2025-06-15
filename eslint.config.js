@@ -5,6 +5,15 @@ import typescriptParser from '@typescript-eslint/parser';
 export default [
   js.configs.recommended,
   {
+    ignores: [
+      'node_modules/',
+      'dist/',
+      '*.min.js',
+      'extension/out/',
+      '**/build/',
+      '**/.next/',
+      '**/coverage/',
+    ],
     files: ['**/*.{js,jsx,ts,tsx}'],
     languageOptions: {
       parser: typescriptParser,
