@@ -1,0 +1,38 @@
+
+> frontend@0.1.0 build
+> next build
+
+Attention: Next.js now collects completely anonymous telemetry regarding usage.
+This information is used to shape Next.js' roadmap and prioritize features.
+You can learn more, including how to opt-out if you'd not like to participate in this anonymous program, by visiting the following URL:
+https://nextjs.org/telemetry
+
+   ▲ Next.js 15.3.3
+
+   Creating an optimized production build ...
+ ✓ Compiled successfully in 21.0s
+   Skipping validation of types
+   Skipping linting
+   Collecting page data ...
+   Generating static pages (0/9) ...
+Error occurred prerendering page "/_not-found". Read more: https://nextjs.org/docs/messages/prerender-error
+Error: supabaseUrl is required.
+    at new ta (/workspaces/DevScope/frontend/.next/server/chunks/439.js:6:378785)
+    at tr (/workspaces/DevScope/frontend/.next/server/chunks/439.js:6:382949)
+    at 1608 (/workspaces/DevScope/frontend/.next/server/app/_not-found/page.js:1:457)
+    at Object.t [as require] (/workspaces/DevScope/frontend/.next/server/webpack-runtime.js:1:128)
+    at require (/workspaces/DevScope/node_modules/next/dist/compiled/next-server/app-page.runtime.prod.js:140:10304)
+    at u (/workspaces/DevScope/node_modules/next/dist/compiled/next-server/app-page.runtime.prod.js:92:646)
+    at U (/workspaces/DevScope/node_modules/next/dist/compiled/next-server/app-page.runtime.prod.js:92:10632)
+    at T (/workspaces/DevScope/node_modules/next/dist/compiled/next-server/app-page.runtime.prod.js:92:8681)
+    at rM (/workspaces/DevScope/node_modules/next/dist/compiled/next-server/app-page.runtime.prod.js:76:33176)
+    at nW (/workspaces/DevScope/node_modules/next/dist/compiled/next-server/app-page.runtime.prod.js:76:65533)
+Export encountered an error on /_not-found/page: /_not-found, exiting the build.
+ ⨯ Next.js build worker exited with code: 1 and signal: null
+npm error Lifecycle script `build` failed with error:
+npm error code 1
+npm error path /workspaces/DevScope/frontend
+npm error workspace frontend@0.1.0
+npm error location /workspaces/DevScope/frontend
+npm error command failed
+npm error command sh -c next build

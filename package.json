@@ -1,5 +1,6 @@
 {
   "name": "devscope-monorepo",
+  "type": "module",
   "private": true,
   "scripts": {
     "build": "turbo run build",
