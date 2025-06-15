@@ -106,21 +106,26 @@ Analyze the precision and intent of the changes."""
 
 # Language/framework specific analysis hints
 LANGUAGE_ANALYSIS_HINTS = {
-    'javascript': {
-        'test_patterns': ['test', 'spec', '__tests__', '.test.', '.spec.'],
-        'config_patterns': ['package.json', 'webpack', 'babel', 'eslint', 'tsconfig'],
-        'setup_patterns': ['node_modules', 'yarn.lock', 'package-lock.json']
+    "javascript": {
+        "test_patterns": ["test", "spec", "__tests__", ".test.", ".spec."],
+        "config_patterns": ["package.json", "webpack", "babel", "eslint", "tsconfig"],
+        "setup_patterns": ["node_modules", "yarn.lock", "package-lock.json"],
     },
-    'python': {
-        'test_patterns': ['test_', '_test.py', 'tests/', 'pytest'],
-        'config_patterns': ['requirements.txt', 'setup.py', 'pyproject.toml', 'tox.ini'],
-        'setup_patterns': ['__init__.py', 'setup.py', 'requirements']
+    "python": {
+        "test_patterns": ["test_", "_test.py", "tests/", "pytest"],
+        "config_patterns": [
+            "requirements.txt",
+            "setup.py",
+            "pyproject.toml",
+            "tox.ini",
+        ],
+        "setup_patterns": ["__init__.py", "setup.py", "requirements"],
     },
-    'typescript': {
-        'test_patterns': ['test', 'spec', '__tests__', '.test.', '.spec.'],
-        'config_patterns': ['tsconfig.json', 'webpack', 'jest.config'],
-        'setup_patterns': ['package.json', 'yarn.lock', 'node_modules']
-    }
+    "typescript": {
+        "test_patterns": ["test", "spec", "__tests__", ".test.", ".spec."],
+        "config_patterns": ["tsconfig.json", "webpack", "jest.config"],
+        "setup_patterns": ["package.json", "yarn.lock", "node_modules"],
+    },
 }
 
 # Confidence level guidelines
@@ -152,37 +157,38 @@ CONFIDENCE SCORING GUIDELINES:
 - High uncertainty in classification
 """
 
+
 def get_analysis_prompt(commit_data: dict) -> str:
     """
     Generate the appropriate analysis prompt based on commit characteristics.
-    
+
     Args:
         commit_data: Dictionary containing commit information
-        
+
     Returns:
         Formatted prompt string
     """
     # Extract data
-    message = commit_data.get('message', '')
-    files_changed = commit_data.get('files_changed', [])
-    stats = commit_data.get('stats', {})
-    diff_content = commit_data.get('diff', '')
-    commit_type = commit_data.get('commit_type', 'other')
-    branch = commit_data.get('branch', 'unknown')
-    is_merge = commit_data.get('is_merge', False)
-    
+    message = commit_data.get("message", "")
+    files_changed = commit_data.get("files_changed", [])
+    stats = commit_data.get("stats", {})
+    diff_content = commit_data.get("diff", "")
+    commit_type = commit_data.get("commit_type", "other")
+    branch = commit_data.get("branch", "unknown")
+    is_merge = commit_data.get("is_merge", False)
+
     # Prepare file list
-    file_list = ', '.join([f['path'] for f in files_changed[:10]])
+    file_list = ", ".join([f["path"] for f in files_changed[:10]])
     if len(files_changed) > 10:
         file_list += f" ... and {len(files_changed) - 10} more files"
-    
+
     # Truncate diff if too long
     if len(diff_content) > 3000:
         diff_content = diff_content[:3000] + "\n... (truncated for analysis)"
-    
+
     # Choose appropriate prompt based on commit characteristics
-    total_changes = stats.get('additions', 0) + stats.get('deletions', 0)
-    
+    total_changes = stats.get("additions", 0) + stats.get("deletions", 0)
+
     if is_merge:
         # Use merge-specific prompt
         base_prompt = MERGE_COMMIT_PROMPT
@@ -190,72 +196,77 @@ def get_analysis_prompt(commit_data: dict) -> str:
         # Use large commit prompt
         base_prompt = LARGE_COMMIT_PROMPT
     elif total_changes < 10:
-        # Use small commit prompt  
+        # Use small commit prompt
         base_prompt = SMALL_COMMIT_PROMPT
     else:
         # Use standard prompt
         base_prompt = ANALYSIS_PROMPT_TEMPLATE
-    
+
     # Format the prompt
     return base_prompt.format(
         message=message,
         file_list=file_list,
-        additions=stats.get('additions', 0),
-        deletions=stats.get('deletions', 0),
+        additions=stats.get("additions", 0),
+        deletions=stats.get("deletions", 0),
         files_changed=len(files_changed),
         commit_type=commit_type,
         branch=branch,
         is_merge=is_merge,
         diff_content=diff_content,
-        total_changes=total_changes
+        total_changes=total_changes,
     )
+
 
 def get_system_prompt() -> str:
     """Get the system prompt for the AI assistant."""
     return SYSTEM_PROMPT
 
+
 def analyze_file_patterns(files_changed: list) -> dict:
     """
     Analyze file patterns to provide additional context hints.
-    
+
     Args:
         files_changed: List of file change dictionaries
-        
+
     Returns:
         Dictionary with pattern analysis
     """
     patterns = {
-        'test_files': 0,
-        'config_files': 0,
-        'setup_files': 0,
-        'languages': set(),
-        'file_types': set()
+        "test_files": 0,
+        "config_files": 0,
+        "setup_files": 0,
+        "languages": set(),
+        "file_types": set(),
     }
-    
+
     for file_change in files_changed:
-        path = file_change.get('path', '').lower()
-        
+        path = file_change.get("path", "").lower()
+
         # Detect language
-        if path.endswith(('.js', '.jsx', '.ts', '.tsx')):
-            patterns['languages'].add('javascript')
-        elif path.endswith('.py'):
-            patterns['languages'].add('python')
-        elif path.endswith('.java'):
-            patterns['languages'].add('java')
-        elif path.endswith(('.cpp', '.c', '.h')):
-            patterns['languages'].add('c++')
-        
+        if path.endswith((".js", ".jsx", ".ts", ".tsx")):
+            patterns["languages"].add("javascript")
+        elif path.endswith(".py"):
+            patterns["languages"].add("python")
+        elif path.endswith(".java"):
+            patterns["languages"].add("java")
+        elif path.endswith((".cpp", ".c", ".h")):
+            patterns["languages"].add("c++")
+
         # Detect file types
-        if '.' in path:
-            ext = path.split('.')[-1]
-            patterns['file_types'].add(ext)
-        
+        if "." in path:
+            ext = path.split(".")[-1]
+            patterns["file_types"].add(ext)
+
         # Detect patterns
-        if any(pattern in path for pattern in ['test', 'spec', '__tests__']):
-            patterns['test_files'] += 1
-        elif any(pattern in path for pattern in ['config', 'package.json', 'requirements', 'setup']):
-            patterns['config_files'] += 1
-        elif any(pattern in path for pattern in ['__init__', 'main', 'index']):
-            patterns['setup_files'] += 1
-    
+        if any(pattern in path for pattern in ["test", "spec", "__tests__"]):
+            patterns["test_files"] += 1
+        elif any(
+            pattern in path
+            for pattern in ["config", "package.json", "requirements", "setup"]
+        ):
+            patterns["config_files"] += 1
+        elif any(pattern in path for pattern in ["__init__", "main", "index"]):
+            patterns["setup_files"] += 1
+
     return patterns

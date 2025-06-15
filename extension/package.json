@@ -1,23 +1,133 @@
 {
   "name": "devscope-extension",
-  "displayName": "DevScope Extension",
-  "description": "VSCode extension for DevScope development workflows",
-  "version": "0.0.1",
+  "displayName": "DevScope - Developer Productivity Tracker",
+  "description": "Track your coding sessions, productivity patterns, and development workflows directly in VSCode",
+  "version": "1.0.0",
+  "publisher": "devscope",
+  "icon": "assets/icon.png",
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/yourusername/DevScope.git"
+  },
+  "keywords": [
+    "productivity",
+    "analytics",
+    "tracking",
+    "developer",
+    "workflow"
+  ],
   "engines": {
     "vscode": "^1.74.0"
   },
   "categories": [
-    "Other"
+    "Other",
+    "Data Science"
   ],
-  "activationEvents": [],
+  "activationEvents": [
+    "*"
+  ],
   "main": "./out/extension.js",
   "contributes": {
     "commands": [
       {
-        "command": "devscope.helloWorld",
-        "title": "Hello World"
+        "command": "devscope.showProductivitySummary",
+        "title": "Show Productivity Summary",
+        "category": "DevScope"
+      },
+      {
+        "command": "devscope.startFocusSession",
+        "title": "Start Focus Session",
+        "category": "DevScope"
+      },
+      {
+        "command": "devscope.syncNow",
+        "title": "Sync Now",
+        "category": "DevScope"
+      },
+      {
+        "command": "devscope.pauseTracking",
+        "title": "Pause Tracking",
+        "category": "DevScope"
+      },
+      {
+        "command": "devscope.resumeTracking",
+        "title": "Resume Tracking",
+        "category": "DevScope"
+      },
+      {
+        "command": "devscope.openDashboard",
+        "title": "Open Dashboard",
+        "category": "DevScope"
+      },
+      {
+        "command": "devscope.openSettings",
+        "title": "Open Settings",
+        "category": "DevScope"
+      },
+      {
+        "command": "devscope.resetSession",
+        "title": "Reset Session",
+        "category": "DevScope"
       }
-    ]
+    ],
+    "views": {
+      "devscope": [
+        {
+          "id": "devscope-sidebar",
+          "name": "Analytics",
+          "when": "true"
+        }
+      ]
+    },
+    "viewsContainers": {
+      "activitybar": [
+        {
+          "id": "devscope",
+          "title": "DevScope",
+          "icon": "assets/icon.png"
+        }
+      ]
+    },
+    "configuration": {
+      "title": "DevScope",
+      "properties": {
+        "devscope.apiUrl": {
+          "type": "string",
+          "default": "http://localhost:8000/api/v1",
+          "description": "DevScope backend API URL"
+        },
+        "devscope.enableTracking": {
+          "type": "boolean",
+          "default": true,
+          "description": "Enable automatic activity tracking"
+        },
+        "devscope.trackingInterval": {
+          "type": "number",
+          "default": 30,
+          "description": "Tracking interval in seconds"
+        },
+        "devscope.syncInterval": {
+          "type": "number",
+          "default": 300,
+          "description": "Data sync interval in seconds (5 minutes)"
+        },
+        "devscope.apiKey": {
+          "type": "string",
+          "default": "",
+          "description": "DevScope API key for authentication"
+        },
+        "devscope.dashboardUrl": {
+          "type": "string",
+          "default": "http://localhost:3000/dashboard",
+          "description": "DevScope dashboard URL"
+        },
+        "devscope.userId": {
+          "type": "string",
+          "default": "",
+          "description": "DevScope user ID"
+        }
+      }
+    }
   },
   "scripts": {
     "vscode:prepublish": "npm run compile",
@@ -27,12 +137,17 @@
     "lint": "eslint src --ext ts",
     "test": "node ./out/test/runTest.js"
   },
-  "keywords": [],
-  "author": "",
-  "license": "ISC",
+  "author": "DevScope Team",
+  "license": "MIT",
+  "dependencies": {
+    "axios": "^1.6.2"
+  },
   "devDependencies": {
-    "@types/node": "^22.10.2",
+    "@types/node": "^22.15.31",
     "@types/vscode": "^1.96.0",
+    "@typescript-eslint/eslint-plugin": "^8.34.0",
+    "@typescript-eslint/parser": "^8.34.0",
+    "eslint": "^9.29.0",
     "ts-loader": "^9.5.1",
     "typescript": "^5.7.2",
     "vsce": "^2.15.0",

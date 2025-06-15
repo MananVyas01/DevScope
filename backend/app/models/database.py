@@ -16,7 +16,7 @@ if settings.DATABASE_URL.startswith("sqlite"):
         settings.DATABASE_URL,
         echo=settings.DEBUG,
         future=True,
-        connect_args={"check_same_thread": False}
+        connect_args={"check_same_thread": False},
     )
 else:
     engine = create_async_engine(
@@ -43,7 +43,7 @@ metadata = MetaData(
         "uq": "uq_%(table_name)s_%(column_0_name)s",
         "ck": "ck_%(table_name)s_%(constraint_name)s",
         "fk": "fk_%(table_name)s_%(column_0_name)s_%(referred_table_name)s",
-        "pk": "pk_%(table_name)s"
+        "pk": "pk_%(table_name)s",
     }
 )
 
@@ -68,7 +68,7 @@ async def init_db() -> None:
     async with engine.begin() as conn:
         # Import all models here to ensure they are registered
         from app.models.models import User, Activity, Mood, Project, ProjectStats
-        
+
         # Create all tables
         await conn.run_sync(Base.metadata.create_all)
 

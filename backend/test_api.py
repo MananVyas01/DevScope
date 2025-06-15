@@ -5,31 +5,36 @@ import sys
 import os
 
 # Add the backend directory to Python path
-sys.path.insert(0, os.path.join(os.path.dirname(__file__), '..'))
+sys.path.insert(0, os.path.join(os.path.dirname(__file__), ".."))
 
 
 async def test_basic_import():
     """Test basic imports work."""
     try:
         from app.config import settings
+
         print("✅ Config imported successfully")
         print(f"   Environment: {settings.ENVIRONMENT}")
         print(f"   Database URL: {settings.DATABASE_URL}")
-        
+
         from app.models.database import init_db
+
         print("✅ Database models imported successfully")
-        
+
         from app.api.v1.api import api_router
+
         print("✅ API router imported successfully")
-        
+
         from app.main import app
+
         print("✅ FastAPI app imported successfully")
         print(f"   App title: {app.title}")
-        
+
         return True
     except Exception as e:
         print(f"❌ Import failed: {e}")
         import traceback
+
         traceback.print_exc()
         return False
 
@@ -38,7 +43,7 @@ async def test_database_initialization():
     """Test database initialization."""
     try:
         from app.models.database import init_db, engine
-        
+
         print("🔧 Initializing database...")
         await init_db()
         print("✅ Database initialized successfully")
@@ -52,6 +57,7 @@ async def test_database_initialization():
     except Exception as e:
         print(f"❌ Database initialization failed: {e}")
         import traceback
+
         traceback.print_exc()
         return False
 

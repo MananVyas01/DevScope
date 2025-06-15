@@ -29,7 +29,7 @@ structlog.configure(
         structlog.processors.StackInfoRenderer(),
         structlog.processors.format_exc_info,
         structlog.processors.UnicodeDecoder(),
-        structlog.processors.JSONRenderer()
+        structlog.processors.JSONRenderer(),
     ],
     context_class=dict,
     logger_factory=structlog.stdlib.LoggerFactory(),
@@ -69,8 +69,8 @@ if settings.BACKEND_CORS_ORIGINS:
 # Add trusted host middleware for production
 if settings.ENVIRONMENT == "production":
     app.add_middleware(
-        TrustedHostMiddleware, 
-        allowed_hosts=["devscope.app", "api.devscope.app", "*.devscope.app"]
+        TrustedHostMiddleware,
+        allowed_hosts=["devscope.app", "api.devscope.app", "*.devscope.app"],
     )
 
 # Add custom middleware
@@ -93,7 +93,7 @@ async def not_found_handler(request: Request, exc: Any):
     """Handle 404 errors."""
     return JSONResponse(
         status_code=status.HTTP_404_NOT_FOUND,
-        content={"message": "Endpoint not found", "path": request.url.path}
+        content={"message": "Endpoint not found", "path": request.url.path},
     )
 
 
@@ -103,7 +103,7 @@ async def internal_error_handler(request: Request, exc: Any):
     logger.error("Internal server error", exc_info=exc, request_path=request.url.path)
     return JSONResponse(
         status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,
-        content={"message": "Internal server error"}
+        content={"message": "Internal server error"},
     )
 
 
@@ -114,7 +114,7 @@ async def root():
         "message": "Welcome to DevScope API",
         "version": settings.VERSION,
         "environment": settings.ENVIRONMENT,
-        "docs": "/docs" if settings.DEBUG else None
+        "docs": "/docs" if settings.DEBUG else None,
     }
 
 
@@ -124,22 +124,19 @@ async def health_check():
     return {
         "status": "healthy",
         "timestamp": time.time(),
-        "environment": settings.ENVIRONMENT
+        "environment": settings.ENVIRONMENT,
     }
 
 
 @app.get(f"{settings.API_V1_STR}/health")
 async def api_health_check():
     """API health check endpoint."""
-    return {
-        "status": "healthy",
-        "api_version": "v1",
-        "timestamp": time.time()
-    }
+    return {"status": "healthy", "api_version": "v1", "timestamp": time.time()}
 
 
 # Include API routers
 from app.api.v1.api import api_router
+
 app.include_router(api_router, prefix=settings.API_V1_STR)
 
 
@@ -147,6 +144,7 @@ app.include_router(api_router, prefix=settings.API_V1_STR)
 async def startup_event():
     """Initialize database on startup."""
     from app.models.database import init_db
+
     await init_db()
     logger.info("Database initialized")
 
@@ -155,13 +153,14 @@ async def startup_event():
 async def shutdown_event():
     """Clean up on shutdown."""
     from app.models.database import close_db
+
     await close_db()
     logger.info("Database connections closed")
 
 
 if __name__ == "__main__":
     import uvicorn
-    
+
     uvicorn.run(
         "app.main:app",
         host="0.0.0.0",

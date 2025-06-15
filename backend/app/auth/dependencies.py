@@ -9,18 +9,18 @@ from app.auth.supabase_auth import SupabaseAuth
 from app.config import settings
 from app.schemas.schemas import User
 
-security = HTTPBearer()
+security = HTTPBearer(auto_error=False)  # Don't auto-error for optional auth
 supabase_auth = SupabaseAuth()
 
 
 async def get_current_user(
-    credentials: HTTPAuthorizationCredentials = Depends(security)
+    credentials: HTTPAuthorizationCredentials = Depends(security),
 ) -> User:
     """
     Get current authenticated user from JWT token.
     """
     token = credentials.credentials
-    
+
     try:
         # Verify the Supabase JWT token
         user = await verify_supabase_token(token)
@@ -43,20 +43,20 @@ async def verify_supabase_token(token: str) -> User:
             token,
             settings.JWT_SECRET,
             algorithms=[settings.ALGORITHM],
-            audience="authenticated"
+            audience="authenticated",
         )
-        
+
         user_id: str = payload.get("sub")
         if user_id is None:
             raise HTTPException(
                 status_code=status.HTTP_401_UNAUTHORIZED,
-                detail="Invalid token: no user ID found"
+                detail="Invalid token: no user ID found",
             )
-        
+
         # Extract user information from token
         user_metadata = payload.get("user_metadata", {})
         email = payload.get("email")
-        
+
         return User(
             id=user_id,
             email=email,
@@ -64,23 +64,21 @@ async def verify_supabase_token(token: str) -> User:
             avatar_url=user_metadata.get("avatar_url"),
             provider=payload.get("app_metadata", {}).get("provider"),
             created_at=payload.get("created_at"),
-            updated_at=payload.get("updated_at")
+            updated_at=payload.get("updated_at"),
         )
-        
+
     except jwt.ExpiredSignatureError:
         raise HTTPException(
-            status_code=status.HTTP_401_UNAUTHORIZED,
-            detail="Token has expired"
+            status_code=status.HTTP_401_UNAUTHORIZED, detail="Token has expired"
         )
     except jwt.JWTError:
         raise HTTPException(
-            status_code=status.HTTP_401_UNAUTHORIZED,
-            detail="Invalid token"
+            status_code=status.HTTP_401_UNAUTHORIZED, detail="Invalid token"
         )
 
 
-async def get_optional_current_user(
-    credentials: Optional[HTTPAuthorizationCredentials] = Depends(security)
+async def get_current_user_optional(
+    credentials: Optional[HTTPAuthorizationCredentials] = Depends(security),
 ) -> Optional[User]:
     """
     Get current user if authenticated, otherwise return None.
@@ -88,7 +86,25 @@ async def get_optional_current_user(
     """
     if not credentials:
         return None
-    
+
+    try:
+        token = credentials.credentials
+        user = await verify_supabase_token(token)
+        return user
+    except HTTPException:
+        return None
+
+
+async def get_optional_current_user(
+    credentials: Optional[HTTPAuthorizationCredentials] = Depends(security),
+) -> Optional[User]:
+    """
+    Get current user if authenticated, otherwise return None.
+    Useful for endpoints that work for both authenticated and anonymous users.
+    """
+    if not credentials:
+        return None
+
     try:
         return await get_current_user(credentials)
     except HTTPException:
@@ -99,18 +115,18 @@ def require_roles(*roles: str):
     """
     Dependency factory for role-based access control.
     """
+
     async def role_checker(current_user: User = Depends(get_current_user)) -> User:
         # In a real implementation, you'd check user roles from database
         # For now, we'll assume all authenticated users have basic access
-        user_roles = getattr(current_user, 'roles', ['user'])
-        
+        user_roles = getattr(current_user, "roles", ["user"])
+
         if not any(role in user_roles for role in roles):
             raise HTTPException(
-                status_code=status.HTTP_403_FORBIDDEN,
-                detail="Insufficient permissions"
+                status_code=status.HTTP_403_FORBIDDEN, detail="Insufficient permissions"
             )
         return current_user
-    
+
     return role_checker
 
 
@@ -118,9 +134,8 @@ def require_verified_email(current_user: User = Depends(get_current_user)) -> Us
     """
     Require user to have verified email.
     """
-    if not getattr(current_user, 'email_verified', True):
+    if not getattr(current_user, "email_verified", True):
         raise HTTPException(
-            status_code=status.HTTP_403_FORBIDDEN,
-            detail="Email verification required"
+            status_code=status.HTTP_403_FORBIDDEN, detail="Email verification required"
         )
     return current_user

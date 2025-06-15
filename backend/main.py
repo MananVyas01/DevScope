@@ -9,7 +9,7 @@ load_dotenv()
 app = FastAPI(
     title="DevScope Backend API",
     description="Backend API for DevScope productivity tracker",
-    version="0.1.0"
+    version="0.1.0",
 )
 
 # Configure CORS
@@ -21,13 +21,16 @@ app.add_middleware(
     allow_headers=["*"],
 )
 
+
 @app.get("/")
 async def root():
     return {"message": "DevScope Backend API", "version": "0.1.0"}
 
+
 @app.get("/health")
 async def health_check():
     return {"status": "healthy", "service": "devscope-backend"}
+
 
 @app.get("/api/v1/status")
 async def api_status():
@@ -38,10 +41,12 @@ async def api_status():
             "activity_tracking",
             "analytics",
             "github_integration",
-            "ai_insights"
-        ]
+            "ai_insights",
+        ],
     }
+
 
 if __name__ == "__main__":
     import uvicorn
+
     uvicorn.run(app, host="0.0.0.0", port=8000)

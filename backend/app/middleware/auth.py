@@ -13,9 +13,9 @@ class AuthMiddleware(BaseHTTPMiddleware):
         """Process the request with authentication."""
         # For now, this is a placeholder middleware
         # Authentication is handled by dependencies in individual endpoints
-        
+
         # You could add global auth logic here if needed
         # For example, setting user context, checking rate limits per user, etc.
-        
+
         response = await call_next(request)
         return response

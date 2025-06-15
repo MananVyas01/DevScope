@@ -10,12 +10,14 @@ from pydantic import BaseModel, EmailStr, Field, ConfigDict
 # Base schemas
 class BaseSchema(BaseModel):
     """Base schema with common configuration."""
+
     model_config = ConfigDict(from_attributes=True)
 
 
 # User schemas
 class UserBase(BaseSchema):
     """Base user schema."""
+
     email: EmailStr
     full_name: Optional[str] = None
     avatar_url: Optional[str] = None
@@ -24,11 +26,20 @@ class UserBase(BaseSchema):
 
 class UserCreate(UserBase):
     """Schema for creating a user."""
+
     github_id: Optional[str] = None
+
+
+class UserLogin(BaseSchema):
+    """Schema for user login."""
+
+    email: EmailStr
+    password: str
 
 
 class UserUpdate(BaseSchema):
     """Schema for updating a user."""
+
     full_name: Optional[str] = None
     avatar_url: Optional[str] = None
     github_username: Optional[str] = None
@@ -36,6 +47,7 @@ class UserUpdate(BaseSchema):
 
 class UserInDB(UserBase):
     """User schema with database fields."""
+
     id: UUID
     github_id: Optional[str] = None
     is_active: bool
@@ -47,13 +59,17 @@ class UserInDB(UserBase):
 
 class User(UserInDB):
     """Public user schema."""
+
     pass
 
 
 # Activity schemas
 class ActivityBase(BaseSchema):
     """Base activity schema."""
-    activity_type: str = Field(..., description="Type of activity (coding, meeting, break, etc.)")
+
+    activity_type: str = Field(
+        ..., description="Type of activity (coding, meeting, break, etc.)"
+    )
     description: Optional[str] = None
     duration_minutes: int = Field(..., ge=0, description="Duration in minutes")
     project_id: Optional[UUID] = None
@@ -64,11 +80,13 @@ class ActivityBase(BaseSchema):
 
 class ActivityCreate(ActivityBase):
     """Schema for creating an activity."""
+
     pass
 
 
 class ActivityUpdate(BaseSchema):
     """Schema for updating an activity."""
+
     activity_type: Optional[str] = None
     description: Optional[str] = None
     duration_minutes: Optional[int] = Field(None, ge=0)
@@ -79,6 +97,7 @@ class ActivityUpdate(BaseSchema):
 
 class ActivityInDB(ActivityBase):
     """Activity schema with database fields."""
+
     id: UUID
     user_id: UUID
     created_at: datetime
@@ -86,12 +105,14 @@ class ActivityInDB(ActivityBase):
 
 class Activity(ActivityInDB):
     """Public activity schema."""
+
     pass
 
 
 # Mood schemas
 class MoodBase(BaseSchema):
     """Base mood schema."""
+
     mood_score: int = Field(..., ge=1, le=10, description="Mood score (1-10)")
     energy_level: int = Field(..., ge=1, le=5, description="Energy level (1-5)")
     stress_level: int = Field(..., ge=1, le=5, description="Stress level (1-5)")
@@ -101,11 +122,13 @@ class MoodBase(BaseSchema):
 
 class MoodCreate(MoodBase):
     """Schema for creating a mood entry."""
+
     pass
 
 
 class MoodUpdate(BaseSchema):
     """Schema for updating a mood entry."""
+
     mood_score: Optional[int] = Field(None, ge=1, le=10)
     energy_level: Optional[int] = Field(None, ge=1, le=5)
     stress_level: Optional[int] = Field(None, ge=1, le=5)
@@ -115,6 +138,7 @@ class MoodUpdate(BaseSchema):
 
 class MoodInDB(MoodBase):
     """Mood schema with database fields."""
+
     id: UUID
     user_id: UUID
     created_at: datetime
@@ -122,34 +146,39 @@ class MoodInDB(MoodBase):
 
 class Mood(MoodInDB):
     """Public mood schema."""
+
     pass
 
 
 # Project schemas
 class ProjectBase(BaseSchema):
     """Base project schema."""
+
     name: str = Field(..., min_length=1, max_length=100)
     description: Optional[str] = None
     github_repo: Optional[str] = None
-    color: Optional[str] = Field(None, pattern=r'^#[0-9A-Fa-f]{6}$')
+    color: Optional[str] = Field(None, pattern=r"^#[0-9A-Fa-f]{6}$")
 
 
 class ProjectCreate(ProjectBase):
     """Schema for creating a project."""
+
     pass
 
 
 class ProjectUpdate(BaseSchema):
     """Schema for updating a project."""
+
     name: Optional[str] = Field(None, min_length=1, max_length=100)
     description: Optional[str] = None
     github_repo: Optional[str] = None
-    color: Optional[str] = Field(None, pattern=r'^#[0-9A-Fa-f]{6}$')
+    color: Optional[str] = Field(None, pattern=r"^#[0-9A-Fa-f]{6}$")
     is_active: Optional[bool] = None
 
 
 class ProjectInDB(ProjectBase):
     """Project schema with database fields."""
+
     id: UUID
     user_id: UUID
     is_active: bool
@@ -159,12 +188,14 @@ class ProjectInDB(ProjectBase):
 
 class Project(ProjectInDB):
     """Public project schema."""
+
     pass
 
 
 # Project stats schemas
 class ProjectStatsBase(BaseSchema):
     """Base project stats schema."""
+
     date: datetime
     total_minutes: int = 0
     coding_minutes: int = 0
@@ -180,11 +211,13 @@ class ProjectStatsBase(BaseSchema):
 
 class ProjectStatsCreate(ProjectStatsBase):
     """Schema for creating project stats."""
+
     project_id: UUID
 
 
 class ProjectStatsUpdate(BaseSchema):
     """Schema for updating project stats."""
+
     total_minutes: Optional[int] = None
     coding_minutes: Optional[int] = None
     meeting_minutes: Optional[int] = None
@@ -199,6 +232,7 @@ class ProjectStatsUpdate(BaseSchema):
 
 class ProjectStatsInDB(ProjectStatsBase):
     """Project stats schema with database fields."""
+
     id: UUID
     user_id: UUID
     project_id: UUID
@@ -208,12 +242,14 @@ class ProjectStatsInDB(ProjectStatsBase):
 
 class ProjectStats(ProjectStatsInDB):
     """Public project stats schema."""
+
     pass
 
 
 # Analytics schemas
 class DailyStats(BaseSchema):
     """Daily statistics summary."""
+
     date: datetime
     total_minutes: int
     activity_breakdown: Dict[str, int]
@@ -225,6 +261,7 @@ class DailyStats(BaseSchema):
 
 class WeeklyStats(BaseSchema):
     """Weekly statistics summary."""
+
     week_start: datetime
     week_end: datetime
     total_minutes: int
@@ -236,6 +273,7 @@ class WeeklyStats(BaseSchema):
 
 class MonthlyStats(BaseSchema):
     """Monthly statistics summary."""
+
     month: int
     year: int
     total_minutes: int
@@ -248,6 +286,7 @@ class MonthlyStats(BaseSchema):
 # Timer schemas
 class TimerSession(BaseSchema):
     """Timer session schema."""
+
     project_id: Optional[UUID] = None
     activity_type: str = "coding"
     description: Optional[str] = None
@@ -257,6 +296,7 @@ class TimerSession(BaseSchema):
 
 class TimerSessionResponse(BaseSchema):
     """Timer session response."""
+
     session_id: UUID
     project_id: Optional[UUID] = None
     activity_type: str
@@ -270,6 +310,7 @@ class TimerSessionResponse(BaseSchema):
 # GitHub schemas
 class GitHubRepo(BaseSchema):
     """GitHub repository schema."""
+
     name: str
     full_name: str
     description: Optional[str] = None
@@ -283,6 +324,7 @@ class GitHubRepo(BaseSchema):
 
 class GitHubCommit(BaseSchema):
     """GitHub commit schema."""
+
     sha: str
     message: str
     author: str
@@ -294,6 +336,7 @@ class GitHubCommit(BaseSchema):
 
 class GitHubStats(BaseSchema):
     """GitHub statistics schema."""
+
     total_commits: int
     total_repos: int
     languages: Dict[str, int]
@@ -304,6 +347,7 @@ class GitHubStats(BaseSchema):
 # Authentication schemas
 class Token(BaseSchema):
     """Token schema."""
+
     access_token: str
     token_type: str = "bearer"
     expires_in: int
@@ -311,11 +355,13 @@ class Token(BaseSchema):
 
 class TokenRefresh(BaseSchema):
     """Token refresh schema."""
+
     refresh_token: str
 
 
 class AuthCallback(BaseSchema):
     """OAuth callback schema."""
+
     code: str
     state: Optional[str] = None
 
@@ -323,11 +369,13 @@ class AuthCallback(BaseSchema):
 # Response schemas
 class MessageResponse(BaseSchema):
     """Generic message response."""
+
     message: str
 
 
 class ErrorResponse(BaseSchema):
     """Error response schema."""
+
     error: str
     detail: Optional[str] = None
     code: Optional[str] = None
