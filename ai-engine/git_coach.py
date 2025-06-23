@@ -270,14 +270,16 @@ class GitCoach:
             # Get basic git activity for context
             git_data = self.get_git_activity(hours=24)
 
-            if git_data and git_data.get("commits"):
-                # If we have commits, provide personalized insights
+            if git_data and git_data.get("commits"):                # If we have commits, provide personalized insights
                 commit_count = len(git_data["commits"])
                 stats = git_data.get("stats", {})
+                files_changed = stats.get("files_changed", 0)
+                lines_added = stats.get("lines_added", 0)
+                lines_deleted = stats.get("lines_deleted", 0)
 
                 # Create a simple prompt for quick insights
                 prompt = f"""
-                Based on recent activity ({commit_count} commits in 24h), provide quick developer insights.
+                Based on recent activity ({commit_count} commits, {files_changed} files changed, +{lines_added}/-{lines_deleted} lines in 24h), provide quick developer insights.
                 
                 Respond with JSON containing:
                 - "summary": Brief encouraging message about recent work
