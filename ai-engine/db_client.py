@@ -359,25 +359,27 @@ class BackendAPIClient:
                     "analysis_type": "daily_git_review",
                     "git_commits_analyzed": review_data.get("commits_analyzed", 0),
                     "files_changed": review_data.get("files_changed", 0),
-                }
+                },
             }
 
             success = await self._send_to_backend(activity_data)
-            
+
             if not success:
                 # Store offline for retry
                 await self._store_offline(activity_data)
-                
+
             return success
 
         except Exception as e:
             print(f"  ⚠️ Error storing AI review: {e}")
-            await self._store_offline({
-                "user_id": user_id,
-                "review_data": review_data,
-                "timestamp": datetime.now().isoformat(),
-                "type": "ai_review"
-            })
+            await self._store_offline(
+                {
+                    "user_id": user_id,
+                    "review_data": review_data,
+                    "timestamp": datetime.now().isoformat(),
+                    "type": "ai_review",
+                }
+            )
             return False
 
 
@@ -428,7 +430,10 @@ if __name__ == "__main__":
         # Test AI review storage
         test_review_data = {
             "summary": "Reviewed changes in timer.js and settings.py",
-            "suggestions": ["Consider optimizing the timer function", "Check for edge cases in settings"],
+            "suggestions": [
+                "Consider optimizing the timer function",
+                "Check for edge cases in settings",
+            ],
             "tags": ["ai-review", "bugfix", "timer"],
             "productivity_score": 4.5,
             "commits_analyzed": 3,

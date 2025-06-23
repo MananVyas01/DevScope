@@ -218,7 +218,8 @@ async def complete_timer_session(
         user_id=current_user.id,
         project_id=session_data["project_id"],
         activity_type=session_data["activity_type"],
-        description=session_data["description"] or f"Focus session - {session_data['activity_type']}",
+        description=session_data["description"]
+        or f"Focus session - {session_data['activity_type']}",
         duration_minutes=actual_duration,
         started_at=session_data["started_at"],
         ended_at=now,
