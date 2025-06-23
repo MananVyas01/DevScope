@@ -3,7 +3,7 @@
 import os
 from typing import Any, Dict, List, Optional, Union
 
-from pydantic import AnyHttpUrl, PostgresDsn, field_validator
+from pydantic import AnyHttpUrl, PostgresDsn, field_validator, Field
 from pydantic_settings import BaseSettings
 
 
@@ -24,16 +24,20 @@ class Settings(BaseSettings):
     # Security
     SECRET_KEY: str = "your-super-secret-key-for-development-change-in-production"
     ALGORITHM: str = "HS256"
-    ACCESS_TOKEN_EXPIRE_MINUTES: int = 30
+    ACCESS_TOKEN_EXPIRE_MINUTES: int = 30  # CORS
+    BACKEND_CORS_ORIGINS: str = "http://localhost:3000,http://localhost:8080" @ property
 
-    # CORS
-    BACKEND_CORS_ORIGINS: List[str] = ["http://localhost:3000", "http://localhost:8080"]
+    def cors_origins(self) -> List[str]:
+        """Get CORS origins as a list."""
+        if isinstance(self.BACKEND_CORS_ORIGINS, str):
+            return [origin.strip() for origin in self.BACKEND_CORS_ORIGINS.split(",")]
+        return self.BACKEND_CORS_ORIGINS
 
     # Supabase Configuration
-    SUPABASE_URL: str = "https://your-project.supabase.co"
-    SUPABASE_ANON_KEY: str = "test-anon-key"
-    SUPABASE_SERVICE_KEY: str = "test-service-key"
-    JWT_SECRET: str = "test-jwt-secret"
+    SUPABASE_URL: str = Field(default="", env="SUPABASE_URL")
+    SUPABASE_ANON_KEY: str = Field(default="", env="SUPABASE_ANON_KEY")
+    SUPABASE_SERVICE_KEY: str = Field(default="", env="SUPABASE_SERVICE_KEY")
+    JWT_SECRET: str = Field(default="", env="JWT_SECRET")
 
     # Database
     DATABASE_URL: Optional[str] = "sqlite+aiosqlite:///./devscope.db"
@@ -63,14 +67,13 @@ class Settings(BaseSettings):
         return "sqlite+aiosqlite:///./devscope.db"
 
     # Redis
-    REDIS_URL: str = "redis://localhost:6379/0"
-
-    # External APIs
+    REDIS_URL: str = "redis://localhost:6379/0"  # External APIs
     GITHUB_TOKEN: Optional[str] = None
     GITHUB_CLIENT_ID: Optional[str] = None
     GITHUB_CLIENT_SECRET: Optional[str] = None
     GITHUB_WEBHOOK_SECRET: Optional[str] = None
     OPENAI_API_KEY: Optional[str] = None
+    GROQ_API_KEY: Optional[str] = None
 
     # Rate Limiting
     RATE_LIMIT_REQUESTS: int = 100

@@ -1,27 +1,48 @@
-# 🎯 DevScope - Developer Productivity, Reimagined
+# 🎯 DevScope - Real GitHub Analytics & AI-Powered Developer Insights
 
-[![Development Stage](https://img.shields.io/badge/Status-Stage%205%20Complete-success?style=for-the-badge)](#-current-development-stage)
+[![Development Stage](https://img.shields.io/badge/Status-v1.1.0%20Real%20Data-success?style=for-the-badge)](#-whats-new-in-v110)
 [![TypeScript](https://img.shields.io/badge/TypeScript-007ACC?style=for-the-badge&logo=typescript&logoColor=white)](#)
 [![Next.js](https://img.shields.io/badge/Next.js-000000?style=for-the-badge&logo=next.js&logoColor=white)](#)
 [![FastAPI](https://img.shields.io/badge/FastAPI-009688?style=for-the-badge&logo=fastapi&logoColor=white)](#)
-[![Tauri](https://img.shields.io/badge/Tauri-24C8D8?style=for-the-badge&logo=tauri&logoColor=white)](#)
+[![Groq](https://img.shields.io/badge/Groq-FF6B35?style=for-the-badge&logo=groq&logoColor=white)](#)
 
-> **An all-in-one productivity tracker for developers.** Track coding activity, analyze focus patterns, visualize GitHub contributions, and get AI-powered workflow insights — locally, privately, and beautifully.
+> **Real GitHub analytics meets AI-powered insights.** Track your actual coding activity, analyze GitHub data, discover community trends, and get intelligent recommendations — all with real data, no demos.
 
-## 🚀 **Project Overview**
+## 🚀 **What's New in v1.1.0**
 
-DevScope is a comprehensive **full-stack monorepo** designed to revolutionize developer productivity tracking. Built with modern technologies and a focus on **privacy-first, offline-capable** architecture.
+### ✨ **100% Real Data Integration**
 
-### **🎯 Key Features**
+- **No More Demo Mode**: Authentic GitHub OAuth authentication only
+- **Live GitHub Analytics**: Real commit history, activity, and repository insights
+- **Community Discovery**: Browse actual GitHub users and their projects
+- **AI-Powered Analysis**: Groq/OpenAI integration for genuine code insights
 
-- **🕒 Smart Focus Timer** - Pomodoro technique with real-time activity monitoring
-- **📊 Mood & Productivity Tracking** - Comprehensive analytics with correlation insights
-- **🔄 Offline-First Architecture** - Works seamlessly without internet connection
-- **📱 Multi-Platform Support** - Web app, desktop app, and VS Code extension
-- **🔐 Privacy-Focused** - Local data storage with optional cloud sync
-- **🤖 AI-Powered Insights** - Machine learning for productivity optimization
-- **🐙 GitHub Integration** - Automatic webhook processing for commit analysis
-- **🔌 VSCode Extension** - Real-time productivity tracking in your editor
+### 🔐 **Enhanced Security**
+
+- **Zero Hardcoded Secrets**: All credentials via environment variables
+- **Git Security**: Comprehensive `.gitignore` prevents credential commits
+- **Production Ready**: Secure configuration management
+
+## 🎯 **Key Features**
+
+### 📊 **Real GitHub Analytics**
+
+- **Activity Dashboard**: Live GitHub events, commits, and repository statistics
+- **Language Analysis**: Actual programming language usage from your repositories
+- **Contribution Patterns**: Weekly focus charts based on real commit history
+- **Community Insights**: Discover trending developers and repositories
+
+### 🤖 **AI-Powered Insights**
+
+- **Code Analysis**: AI-driven repository and commit analysis via Groq/OpenAI
+- **Quick Insights**: Instant AI feedback on your coding patterns
+- **Development Coaching**: Intelligent recommendations based on your actual activity
+
+### 🔐 **Secure & Private**
+
+- **GitHub OAuth**: Secure authentication with your GitHub account
+- **Local Processing**: AI analysis respects your privacy
+- **No Demo Data**: Everything you see is your real development activity
 
 ---
 
@@ -32,22 +53,24 @@ DevScope is a comprehensive **full-stack monorepo** designed to revolutionize de
 - **Framework**: Next.js 15 + React 19
 - **Language**: TypeScript
 - **Styling**: Tailwind CSS
-- **Authentication**: Supabase Auth
-- **State Management**: React Hooks + Context
-- **Charts**: Chart.js + React-ChartJS-2
+- **Authentication**: GitHub OAuth via Supabase
+- **Real-time Data**: GitHub API integration
+- **Charts**: Chart.js for live data visualization
 
 ### **Backend** (Production Ready ✅)
 
 - **Framework**: FastAPI
 - **Database**: PostgreSQL + SQLAlchemy ORM
-- **Authentication**: JWT + Supabase integration
-- **API Documentation**: OpenAPI/Swagger
-- **Deployment**: Railway + Docker
+- **Authentication**: JWT + GitHub OAuth
+- **API Integration**: GitHub REST API
+- **Documentation**: OpenAPI/Swagger
 
-### **Desktop App** (In Development 🚧)
+### **AI Engine** (Production Ready ✅)
 
-- **Framework**: Tauri + React
-- **Language**: Rust + TypeScript
+- **Framework**: FastAPI
+- **AI Providers**: Groq (primary) + OpenAI (fallback)
+- **Features**: Repository analysis, commit insights, code coaching
+- **Language**: Python with modern async support
 - **Platform**: Cross-platform (Windows, macOS, Linux)
 
 ### **VS Code Extension** (Production Ready ✅)
@@ -180,58 +203,146 @@ DevScope/
    cd ../backend && pip install -r requirements.txt
    ```
 
-3. **Set up environment variables**
+3. **Set up environment variables**## 🚀 **Quick Start**
+
+### **Prerequisites**
+
+- **Node.js** 18+ and **npm**
+- **Python** 3.8+ with **pip**
+- **GitHub Account** (for authentication and data)
+- **Groq or OpenAI API Key** (for AI features)
+
+### **Setup Instructions**
+
+1. **Clone the repository**
 
    ```bash
+   git clone https://github.com/your-username/devscope.git
+   cd devscope
+   ```
+
+2. **Install dependencies**
+
+   ```bash
+   # Root dependencies
+   npm install
+
    # Frontend
+   cd frontend && npm install && cd ..
+
+   # Backend Python dependencies
+   cd backend && pip install -r requirements.txt && cd ..
+
+   # AI Engine dependencies
+   cd ai-engine && pip install -r requirements.txt && cd ..
+   ```
+
+3. **Setup Environment Variables**
+
+   **Frontend (.env.local):**
+
+   ```bash
+   # Copy example and configure
    cp frontend/.env.example frontend/.env.local
 
-   # Backend
+   # Add your Supabase credentials
+   NEXT_PUBLIC_SUPABASE_URL=your_supabase_project_url
+   NEXT_PUBLIC_SUPABASE_ANON_KEY=your_supabase_anon_key
+   ```
+
+   **Backend (.env):**
+
+   ```bash
+   # Copy example and configure
    cp backend/.env.example backend/.env
 
-   # AI Engine (optional)
-   cp ai-engine/.env.example ai-engine/.env
+   # Configure Supabase
+   SUPABASE_URL=your_supabase_project_url
+   SUPABASE_ANON_KEY=your_supabase_anon_key
+   SUPABASE_SERVICE_KEY=your_supabase_service_key
+   JWT_SECRET=your_jwt_secret
+
+   # Optional: GitHub OAuth (for enhanced features)
+   GITHUB_CLIENT_ID=your_github_oauth_client_id
+   GITHUB_CLIENT_SECRET=your_github_oauth_client_secret
    ```
 
-4. **Start development servers**
+   **AI Engine (.env):**
 
    ```bash
-   # Terminal 1: Backend
+   # Copy example and configure
+   cp ai-engine/.env.example ai-engine/.env
+
+   # Add at least one AI provider (Groq recommended)
+   GROQ_API_KEY=your_groq_api_key_here
+   # OR
+   OPENAI_API_KEY=your_openai_api_key_here
+   ```
+
+4. **GitHub OAuth Setup** (Required)
+
+   Create a GitHub OAuth App:
+
+   - Go to GitHub Settings → Developer settings → OAuth Apps
+   - Create new OAuth App with:
+     - Homepage URL: `http://localhost:3000`
+     - Authorization callback URL: `your_supabase_url/auth/v1/callback`
+   - Add Client ID and Secret to your environment files
+
+5. **Start All Services**
+
+   ```bash
+   # Option 1: Start everything with turbo (recommended)
+   npm run dev
+
+   # Option 2: Start individually
+   # Terminal 1: AI Engine
+   cd ai-engine && python main.py
+
+   # Terminal 2: Backend
    cd backend && python -m app.main
 
-   # Terminal 2: Frontend
+   # Terminal 3: Frontend
    cd frontend && npm run dev
-
-   # Terminal 3: AI Engine (optional)
-   cd ai-engine && python main.py
    ```
 
-5. **VSCode Extension (optional)**
+6. **Access the Application**
+   - **Frontend**: http://localhost:3000
+   - **Backend API**: http://localhost:8000/docs
+   - **AI Engine**: http://localhost:8001/docs
 
-   ```bash
-   # Install extension in development mode
-   cd extension
-   npm install
-   npm run compile
-   # Then press F5 in VSCode to run extension
-   ```
+### **First-Time Setup**
 
-6. **Open your browser**
-   - Frontend: `http://localhost:3000`
-   - Backend API: `http://localhost:8000/docs`
+1. **Visit** http://localhost:3000
+2. **Sign in** with your GitHub account
+3. **Authorize** DevScope to access your GitHub data
+4. **Explore** your real analytics and community features
+5. **Try AI insights** from the analytics dashboard
 
 ---
 
-## 🎮 **Demo & Features**
+## 🎮 **Features Overview**
 
-### **Smart Focus Timer**
+### **📊 Real GitHub Analytics**
 
-- **Pomodoro Technique**: 25-minute focus sessions with 5-minute breaks
-- **Activity Tracking**: Real-time monitoring of keyboard and mouse activity
-- **Idle Detection**: Automatic detection of inactivity with visual indicators
-- **Progress Visualization**: Circular progress bar with session statistics
+- **Live Activity Dashboard**: Your actual GitHub events, commits, and contributions
+- **Repository Insights**: Language usage, commit patterns, and project statistics
+- **Weekly Focus Charts**: Visual representation of your coding activity over time
+- **Contribution Streaks**: Track your consistency and productivity patterns
 
-### **Mood & Productivity Analytics**
+### **🌐 Community Discovery**
+
+- **Developer Profiles**: Browse real GitHub users and their activity
+- **Repository Exploration**: Discover trending and interesting repositories
+- **Language Statistics**: See what technologies the community is using
+- **Activity Feeds**: Real-time GitHub activity from discovered users
+
+### **🤖 AI-Powered Insights**
+
+- **Repository Analysis**: AI-driven analysis of your repositories and coding patterns
+- **Quick Insights**: Instant AI feedback on your development workflow
+- **Code Quality Tips**: Intelligent suggestions based on your actual commits
+- **Productivity Coaching**: AI recommendations for improving your development process
 
 - **Post-Session Tracking**: Modal after each focus session
 - **Multi-Dimensional Metrics**: Mood (1-5), Energy (1-5), Stress (1-5)

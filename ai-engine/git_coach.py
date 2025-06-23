@@ -12,10 +12,11 @@ import openai
 from datetime import datetime, timedelta
 from typing import Dict, List, Optional
 import logging
-from db_client import DatabaseClient
+from db_client import BackendAPIClient
 
 try:
     from groq import Groq
+
     GROQ_AVAILABLE = True
 except ImportError:
     GROQ_AVAILABLE = False
@@ -27,9 +28,18 @@ logger = logging.getLogger(__name__)
 
 
 class GitCoach:
-    def __init__(self, repo_path: str = ".", openai_api_key: Optional[str] = None, groq_api_key: Optional[str] = None, prefer_groq: bool = True):
+    def __init__(
+        self,
+        repo_path: str = ".",
+        openai_api_key: Optional[str] = None,
+        groq_api_key: Optional[str] = None,
+        prefer_groq: bool = True,
+    ):
         self.repo_path = repo_path
-        self.db = DatabaseClient()
+        self.db = BackendAPIClient(
+            base_url=os.getenv("BACKEND_API_URL", "http://localhost:8000/api/v1"),
+            api_key=os.getenv("BACKEND_API_KEY"),
+        )
         self.prefer_groq = prefer_groq
         self.groq_client = None
         self.openai_available = False
@@ -41,7 +51,7 @@ class GitCoach:
                 self.groq_api_key = groq_api_key
             else:
                 self.groq_api_key = os.getenv("GROQ_API_KEY")
-            
+
             if self.groq_api_key:
                 try:
                     self.groq_client = Groq(api_key=self.groq_api_key)
@@ -55,7 +65,7 @@ class GitCoach:
             openai.api_key = openai_api_key
         else:
             openai.api_key = os.getenv("OPENAI_API_KEY")
-            
+
         if openai.api_key:
             self.openai_available = True
             logger.info("OpenAI API initialized successfully")
@@ -65,12 +75,14 @@ class GitCoach:
             raise ValueError(
                 "No AI API available. Set either GROQ_API_KEY or OPENAI_API_KEY environment variable."
             )
-        
+
         # Log which APIs will be used
         if self.groq_available and self.openai_available:
             primary = "Groq" if self.prefer_groq else "OpenAI"
             fallback = "OpenAI" if self.prefer_groq else "Groq"
-            logger.info(f"Both APIs available. Primary: {primary}, Fallback: {fallback}")
+            logger.info(
+                f"Both APIs available. Primary: {primary}, Fallback: {fallback}"
+            )
         elif self.groq_available:
             logger.info("Using Groq API only")
         else:
@@ -208,7 +220,10 @@ class GitCoach:
 
             # Try Groq first if preferred
             if self.groq_available and self.prefer_groq:
-                response = self._call_groq_api(prompt, "You are an AI code coach helping developers improve their productivity and code quality. Respond only with valid JSON.")
+                response = self._call_groq_api(
+                    prompt,
+                    "You are an AI code coach helping developers improve their productivity and code quality. Respond only with valid JSON.",
+                )
             # Fallback to OpenAI
             else:
                 response = openai.ChatCompletion.create(
@@ -236,11 +251,107 @@ class GitCoach:
             logger.error(f"Error with AI analysis: {e}")
             return self._get_fallback_analysis(git_data)
 
+    def get_git_data(self, hours_back: int = 24) -> Dict:
+        """Get git data for analysis - wrapper around get_git_activity."""
+        git_data = self.get_git_activity(hours_back)
+        if git_data and git_data.get("commits"):
+            git_data["total_commits"] = len(git_data["commits"])
+        else:
+            git_data["total_commits"] = 0
+        return git_data
+
+    def generate_insights(self, git_data: Dict) -> Dict:
+        """Generate AI insights from git data - wrapper around analyze_with_ai."""
+        return self.analyze_with_ai(git_data)
+
+    def generate_quick_insights(self) -> Dict:
+        """Generate quick AI insights without detailed git analysis."""
+        try:
+            # Get basic git activity for context
+            git_data = self.get_git_activity(hours=24)
+
+            if git_data and git_data.get("commits"):
+                # If we have commits, provide personalized insights
+                commit_count = len(git_data["commits"])
+                stats = git_data.get("stats", {})
+
+                # Create a simple prompt for quick insights
+                prompt = f"""
+                Based on recent activity ({commit_count} commits in 24h), provide quick developer insights.
+                
+                Respond with JSON containing:
+                - "summary": Brief encouraging message about recent work
+                - "suggestions": Array of 2-3 quick productivity tips
+                - "productivity_score": Score 1-10 based on activity
+                - "tags": Array of relevant tags
+                
+                Keep it brief and motivational.
+                """
+
+                # Try to get AI insights
+                if self.groq_available:
+                    try:
+                        response = self.groq_client.chat.completions.create(
+                            model="llama-3.1-70b-versatile",
+                            messages=[
+                                {
+                                    "role": "system",
+                                    "content": "You are a helpful AI coach. Respond only with valid JSON.",
+                                },
+                                {"role": "user", "content": prompt},
+                            ],
+                            max_tokens=300,
+                            temperature=0.7,
+                        )
+                        ai_response = response.choices[0].message.content.strip()
+                        analysis = self._parse_ai_response(ai_response, git_data)
+                        return analysis
+                    except Exception as e:
+                        logger.warning(f"Quick insights AI call failed: {e}")
+
+                # Fallback to simple analysis
+                return {
+                    "summary": f"Great work! You've made {commit_count} commits recently.",
+                    "suggestions": [
+                        "Keep up the consistent coding rhythm",
+                        "Consider documenting your changes",
+                        "Take breaks to maintain productivity",
+                    ],
+                    "productivity_score": min(10, max(1, commit_count * 2)),
+                    "tags": ["general", "productivity"],
+                }
+            else:
+                # No recent activity
+                return {
+                    "summary": "Ready to start coding? Let's build something amazing!",
+                    "suggestions": [
+                        "Start with a simple commit to get momentum",
+                        "Set small, achievable goals for today",
+                        "Consider reviewing your project roadmap",
+                    ],
+                    "productivity_score": 5,
+                    "tags": ["getting-started", "motivation"],
+                }
+
+        except Exception as e:
+            logger.error(f"Quick insights generation failed: {e}")
+            # Ultimate fallback
+            return {
+                "summary": "AI insights are being prepared for you.",
+                "suggestions": [
+                    "Continue your development workflow",
+                    "Make regular commits to track progress",
+                    "Use descriptive commit messages",
+                ],
+                "productivity_score": 7,
+                "tags": ["general"],
+            }
+
     def _call_groq_api(self, prompt: str, system_message: str) -> Optional[str]:
         """Call Groq API for analysis."""
         if not self.groq_client:
             return None
-            
+
         try:
             response = self.groq_client.chat.completions.create(
                 model="llama-3.1-70b-versatile",  # Fast and capable model
@@ -369,17 +480,15 @@ def main():
         "--hours", type=int, default=24, help="Hours of history to analyze"
     )
     parser.add_argument(
-        "--prefer-openai", action="store_true", 
-        help="Prefer OpenAI over Groq when both APIs are available"
+        "--prefer-openai",
+        action="store_true",
+        help="Prefer OpenAI over Groq when both APIs are available",
     )
 
     args = parser.parse_args()
 
     try:
-        coach = GitCoach(
-            repo_path=args.repo_path,
-            prefer_groq=not args.prefer_openai
-        )
+        coach = GitCoach(repo_path=args.repo_path, prefer_groq=not args.prefer_openai)
         result = coach.run_daily_analysis(args.user_id)
 
         print(json.dumps(result, indent=2))

@@ -1,6 +1,5 @@
 'use client';
 
-import { useState } from 'react';
 import { BarChart3, TrendingUp, Brain, Code, Heart } from 'lucide-react';
 import WeeklyFocusChart from '@/components/charts/WeeklyFocusChart';
 import MoodVsBugChart from '@/components/charts/MoodVsBugChart';
@@ -8,13 +7,15 @@ import LanguageUsagePie from '@/components/charts/LanguageUsagePie';
 import GitHubActivityChart from '@/components/charts/GitHubActivityChart';
 import MoodProductivityScatter from '@/components/charts/MoodProductivityScatter';
 import StatsCard from '@/components/cards/StatsCard';
+import { useAnalyticsData } from '@/hooks/useAnalyticsData';
 
 export default function AnalyticsPage() {
-  const [useMockData, setUseMockData] = useState(true);
+  const { data: analyticsData, loading: analyticsLoading } = useAnalyticsData();
 
   return (
     <div className="min-h-screen bg-gray-50 dark:bg-gray-900 p-6">
       <div className="max-w-7xl mx-auto">
+        {' '}
         {/* Header */}
         <div className="mb-8">
           <div className="flex items-center justify-between">
@@ -24,55 +25,73 @@ export default function AnalyticsPage() {
                 Analytics Dashboard
               </h1>
               <p className="text-gray-600 dark:text-gray-400 mt-2">
-                Visualize your productivity patterns and developer insights
+                Real-time insights from your GitHub activity and AI analysis
               </p>
             </div>
-            <div className="flex items-center gap-2">
-              <label className="flex items-center gap-2 text-sm text-gray-600 dark:text-gray-400">
-                <input
-                  type="checkbox"
-                  checked={useMockData}
-                  onChange={e => setUseMockData(e.target.checked)}
-                  className="rounded"
-                />
-                Use Mock Data
-              </label>
-            </div>
           </div>
-        </div>
-
+        </div>{' '}
         {/* Summary Stats Cards */}
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6 mb-8">
-          <StatsCard
-            title="Total Focus Hours"
-            value="42.5h"
-            change="+12%"
-            changeType="positive"
-            icon={<TrendingUp className="h-5 w-5" />}
-          />
-          <StatsCard
-            title="Avg Mood Score"
-            value="4.2/5"
-            change="+0.3"
-            changeType="positive"
-            icon={<Heart className="h-5 w-5" />}
-          />
-          <StatsCard
-            title="Commits This Week"
-            value="34"
-            change="-5%"
-            changeType="negative"
-            icon={<Code className="h-5 w-5" />}
-          />
-          <StatsCard
-            title="Productivity Score"
-            value="87%"
-            change="+15%"
-            changeType="positive"
-            icon={<Brain className="h-5 w-5" />}
-          />
+          {analyticsLoading ? (
+            // Loading placeholders
+            Array.from({ length: 4 }).map((_, i) => (
+              <div
+                key={i}
+                className="bg-white dark:bg-gray-800 rounded-lg p-6 shadow-sm animate-pulse"
+              >
+                <div className="h-16 bg-gray-200 dark:bg-gray-700 rounded"></div>
+              </div>
+            ))
+          ) : (
+            <>
+              {' '}
+              <StatsCard
+                title="Total Focus Hours"
+                value={`${analyticsData?.totalFocusHours || 0}h`}
+                change={`${(analyticsData?.changes?.focusHours || 0) > 0 ? '+' : ''}${(analyticsData?.changes?.focusHours || 0).toFixed(1)}%`}
+                changeType={
+                  (analyticsData?.changes?.focusHours || 0) > 0
+                    ? 'positive'
+                    : 'negative'
+                }
+                icon={<TrendingUp className="h-5 w-5" />}
+              />
+              <StatsCard
+                title="Avg Mood Score"
+                value={`${analyticsData?.avgMoodScore || 4.2}/5`}
+                change={`${(analyticsData?.changes?.moodScore || 0) > 0 ? '+' : ''}${(analyticsData?.changes?.moodScore || 0).toFixed(1)}`}
+                changeType={
+                  (analyticsData?.changes?.moodScore || 0) > 0
+                    ? 'positive'
+                    : 'negative'
+                }
+                icon={<Heart className="h-5 w-5" />}
+              />
+              <StatsCard
+                title="Commits This Week"
+                value={`${analyticsData?.commitsThisWeek || 0}`}
+                change={`${(analyticsData?.changes?.commits || 0) > 0 ? '+' : ''}${(analyticsData?.changes?.commits || 0).toFixed(0)}%`}
+                changeType={
+                  (analyticsData?.changes?.commits || 0) > 0
+                    ? 'positive'
+                    : 'negative'
+                }
+                icon={<Code className="h-5 w-5" />}
+              />
+              <StatsCard
+                title="Productivity Score"
+                value={`${analyticsData?.productivityScore?.toFixed(0) || 75}%`}
+                change={`${(analyticsData?.changes?.productivity || 0) > 0 ? '+' : ''}${(analyticsData?.changes?.productivity || 0).toFixed(0)}%`}
+                changeType={
+                  (analyticsData?.changes?.productivity || 0) > 0
+                    ? 'positive'
+                    : 'negative'
+                }
+                icon={<Brain className="h-5 w-5" />}
+              />
+            </>
+          )}
         </div>
-
         {/* Charts Grid */}
         <div className="grid grid-cols-1 lg:grid-cols-2 gap-6 mb-8">
           {/* Weekly Focus Chart */}
@@ -80,7 +99,7 @@ export default function AnalyticsPage() {
             <h3 className="text-lg font-semibold text-gray-900 dark:text-white mb-4">
               Weekly Focus Hours
             </h3>
-            <WeeklyFocusChart useMockData={useMockData} />
+            <WeeklyFocusChart useMockData={false} />
           </div>
 
           {/* GitHub Activity Chart */}
@@ -88,17 +107,16 @@ export default function AnalyticsPage() {
             <h3 className="text-lg font-semibold text-gray-900 dark:text-white mb-4">
               GitHub Activity
             </h3>
-            <GitHubActivityChart useMockData={useMockData} />
+            <GitHubActivityChart useMockData={false} />
           </div>
         </div>
-
         <div className="grid grid-cols-1 lg:grid-cols-3 gap-6 mb-8">
           {/* Language Usage Pie */}
           <div className="bg-white dark:bg-gray-800 rounded-lg p-6 shadow-sm">
             <h3 className="text-lg font-semibold text-gray-900 dark:text-white mb-4">
               Language Usage
             </h3>
-            <LanguageUsagePie useMockData={useMockData} />
+            <LanguageUsagePie useMockData={false} />
           </div>
 
           {/* Mood vs Bug Chart */}
@@ -106,16 +124,15 @@ export default function AnalyticsPage() {
             <h3 className="text-lg font-semibold text-gray-900 dark:text-white mb-4">
               Mood vs Bug Frequency
             </h3>
-            <MoodVsBugChart useMockData={useMockData} />
+            <MoodVsBugChart useMockData={false} />
           </div>
         </div>
-
         {/* Mood vs Productivity Scatter */}
         <div className="bg-white dark:bg-gray-800 rounded-lg p-6 shadow-sm">
           <h3 className="text-lg font-semibold text-gray-900 dark:text-white mb-4">
             Mood vs AI Productivity Score
           </h3>
-          <MoodProductivityScatter useMockData={useMockData} />
+          <MoodProductivityScatter useMockData={false} />
         </div>
       </div>
     </div>
