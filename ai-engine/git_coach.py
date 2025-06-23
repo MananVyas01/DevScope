@@ -2,6 +2,7 @@
 """
 AI Code Coach - Daily Git Analysis Script
 Analyzes last 24 hours of git activity and generates AI-powered insights.
+Supports both OpenAI and Groq APIs for flexibility and speed.
 """
 
 import os
@@ -13,26 +14,67 @@ from typing import Dict, List, Optional
 import logging
 from db_client import DatabaseClient
 
+try:
+    from groq import Groq
+    GROQ_AVAILABLE = True
+except ImportError:
+    GROQ_AVAILABLE = False
+    print("Warning: Groq library not installed. Install with: pip install groq")
+
 # Configure logging
 logging.basicConfig(level=logging.INFO)
 logger = logging.getLogger(__name__)
 
 
 class GitCoach:
-    def __init__(self, repo_path: str = ".", openai_api_key: Optional[str] = None):
+    def __init__(self, repo_path: str = ".", openai_api_key: Optional[str] = None, groq_api_key: Optional[str] = None, prefer_groq: bool = True):
         self.repo_path = repo_path
         self.db = DatabaseClient()
+        self.prefer_groq = prefer_groq
+        self.groq_client = None
+        self.openai_available = False
+        self.groq_available = False
+
+        # Initialize Groq
+        if GROQ_AVAILABLE:
+            if groq_api_key:
+                self.groq_api_key = groq_api_key
+            else:
+                self.groq_api_key = os.getenv("GROQ_API_KEY")
+            
+            if self.groq_api_key:
+                try:
+                    self.groq_client = Groq(api_key=self.groq_api_key)
+                    self.groq_available = True
+                    logger.info("Groq API initialized successfully")
+                except Exception as e:
+                    logger.warning(f"Failed to initialize Groq client: {e}")
 
         # Initialize OpenAI
         if openai_api_key:
             openai.api_key = openai_api_key
         else:
             openai.api_key = os.getenv("OPENAI_API_KEY")
+            
+        if openai.api_key:
+            self.openai_available = True
+            logger.info("OpenAI API initialized successfully")
 
-        if not openai.api_key:
+        # Check if at least one API is available
+        if not self.groq_available and not self.openai_available:
             raise ValueError(
-                "OpenAI API key not found. Set OPENAI_API_KEY environment variable."
+                "No AI API available. Set either GROQ_API_KEY or OPENAI_API_KEY environment variable."
             )
+        
+        # Log which APIs will be used
+        if self.groq_available and self.openai_available:
+            primary = "Groq" if self.prefer_groq else "OpenAI"
+            fallback = "OpenAI" if self.prefer_groq else "Groq"
+            logger.info(f"Both APIs available. Primary: {primary}, Fallback: {fallback}")
+        elif self.groq_available:
+            logger.info("Using Groq API only")
+        else:
+            logger.info("Using OpenAI API only")
 
     def get_git_activity(self, hours: int = 24) -> Dict:
         """Get git commits and changes from the last N hours."""
@@ -128,7 +170,7 @@ class GitCoach:
             return {"commits": [], "stats": {}}
 
     def analyze_with_ai(self, git_data: Dict) -> Dict:
-        """Use OpenAI to analyze git activity and provide insights."""
+        """Use OpenAI or Groq to analyze git activity and provide insights."""
         try:
             if not git_data["commits"]:
                 return {
@@ -164,51 +206,82 @@ class GitCoach:
             Focus on being constructive and specific. Look for patterns in commit messages.
             """
 
-            response = openai.ChatCompletion.create(
-                model="gpt-3.5-turbo",
-                messages=[
-                    {
-                        "role": "system",
-                        "content": "You are an AI code coach helping developers improve their productivity and code quality. Respond only with valid JSON.",
-                    },
-                    {"role": "user", "content": prompt},
-                ],
-                max_tokens=500,
-                temperature=0.7,
-            )
+            # Try Groq first if preferred
+            if self.groq_available and self.prefer_groq:
+                response = self._call_groq_api(prompt, "You are an AI code coach helping developers improve their productivity and code quality. Respond only with valid JSON.")
+            # Fallback to OpenAI
+            else:
+                response = openai.ChatCompletion.create(
+                    model="gpt-3.5-turbo",
+                    messages=[
+                        {
+                            "role": "system",
+                            "content": "You are an AI code coach helping developers improve their productivity and code quality. Respond only with valid JSON.",
+                        },
+                        {"role": "user", "content": prompt},
+                    ],
+                    max_tokens=500,
+                    temperature=0.7,
+                )
 
             # Parse AI response
             ai_response = response.choices[0].message.content.strip()
 
             # Try to parse as JSON
-            try:
-                analysis = json.loads(ai_response)
+            analysis = self._parse_ai_response(ai_response, git_data)
 
-                # Validate required fields
-                required_fields = [
-                    "summary",
-                    "suggestions",
-                    "tags",
-                    "productivity_score",
-                ]
-                for field in required_fields:
-                    if field not in analysis:
-                        analysis[field] = self._get_default_value(field)
-
-                # Ensure suggestions and tags are arrays
-                if not isinstance(analysis["suggestions"], list):
-                    analysis["suggestions"] = [str(analysis["suggestions"])]
-                if not isinstance(analysis["tags"], list):
-                    analysis["tags"] = [str(analysis["tags"])]
-
-                return analysis
-
-            except json.JSONDecodeError:
-                logger.error(f"Failed to parse AI response as JSON: {ai_response}")
-                return self._get_fallback_analysis(git_data)
+            return analysis
 
         except Exception as e:
             logger.error(f"Error with AI analysis: {e}")
+            return self._get_fallback_analysis(git_data)
+
+    def _call_groq_api(self, prompt: str, system_message: str) -> Optional[str]:
+        """Call Groq API for analysis."""
+        if not self.groq_client:
+            return None
+            
+        try:
+            response = self.groq_client.chat.completions.create(
+                model="llama-3.1-70b-versatile",  # Fast and capable model
+                messages=[
+                    {"role": "system", "content": system_message},
+                    {"role": "user", "content": prompt},
+                ],
+                max_tokens=500,
+                temperature=0.7,
+            )
+            return response.choices[0].message.content.strip()
+        except Exception as e:
+            logger.error(f"Groq API call failed: {e}")
+            return None
+
+    def _parse_ai_response(self, ai_response: str, git_data: Dict) -> Dict:
+        """Parse AI response and validate required fields."""
+        try:
+            analysis = json.loads(ai_response)
+
+            # Validate required fields
+            required_fields = [
+                "summary",
+                "suggestions",
+                "tags",
+                "productivity_score",
+            ]
+            for field in required_fields:
+                if field not in analysis:
+                    analysis[field] = self._get_default_value(field)
+
+            # Ensure suggestions and tags are arrays
+            if not isinstance(analysis["suggestions"], list):
+                analysis["suggestions"] = [str(analysis["suggestions"])]
+            if not isinstance(analysis["tags"], list):
+                analysis["tags"] = [str(analysis["tags"])]
+
+            return analysis
+
+        except json.JSONDecodeError:
+            logger.error(f"Failed to parse AI response as JSON: {ai_response}")
             return self._get_fallback_analysis(git_data)
 
     def _get_default_value(self, field: str):
@@ -295,11 +368,18 @@ def main():
     parser.add_argument(
         "--hours", type=int, default=24, help="Hours of history to analyze"
     )
+    parser.add_argument(
+        "--prefer-openai", action="store_true", 
+        help="Prefer OpenAI over Groq when both APIs are available"
+    )
 
     args = parser.parse_args()
 
     try:
-        coach = GitCoach(repo_path=args.repo_path)
+        coach = GitCoach(
+            repo_path=args.repo_path,
+            prefer_groq=not args.prefer_openai
+        )
         result = coach.run_daily_analysis(args.user_id)
 
         print(json.dumps(result, indent=2))
